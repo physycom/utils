@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vector>
 
 namespace physycom{
@@ -32,24 +31,6 @@ namespace physycom{
 					else it++;
 				}
 			} 
-		}
-	}
-
-	void split2(std::vector<std::string>& tok, const std::string& str, const std::string& sep, const int& mode = token_compress_off){
-		tok.clear();
-		if( str.size() ){
-			auto start = str.begin();
-			for( auto it = str.begin(); it != str.end(); it++ ){
-				if( belongs_to(*it, sep) ){
-					if( mode == token_compress_on && it == start ) {
-						start = it + 1;
-						continue;
-					}
-					tok.push_back( std::string(start, it) );
-					start = it + 1;
-				}
-			}
-			if( mode == token_compress_on && start != str.end() ) tok.push_back( std::string(start, str.end() ) );
 		}
 	}
 
