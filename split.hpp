@@ -1,3 +1,6 @@
+#ifndef PHYSYCOM_SPLIT_HPP
+#define PHYSYCOM_SPLIT_HPP
+
 #include <vector>
 
 namespace physycom{
@@ -35,3 +38,5 @@ namespace physycom{
 	}
 
 }   // end namespace physycom
+
+#endif // PHYSYCOM_SPLIT_HPP
