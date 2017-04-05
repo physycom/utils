@@ -1,6 +1,23 @@
-test : test.exe
-	./test/test.exe
+TEST_SPLIT_EXE=test_split.exe
+TEST_GNSS_EXE=test_gnssconv.exe
 
-test.exe: split.hpp test/test.cpp
-	$(CXX) -I. -std=c++11 -o test/test.exe test/test.cpp
+all: dirtree test_gnss test_split
 
+test: test_gnss test_split
+	./bin/$(TEST_SPLIT_EXE)
+	./bin/$(TEST_GNSS_EXE)
+
+test_gnss: dirtree utils_gnssconv.hpp test/test_gnssconv.cpp
+	$(CXX) -std=c++11 -o bin/$(TEST_GNSS_EXE) test/test_gnssconv.cpp 
+
+test_split: dirtree utils_split.hpp test/test_split.cpp
+	$(CXX) -std=c++11 -o bin/$(TEST_SPLIT_EXE) test/test_split.cpp 
+
+dirtree:
+	@mkdir -p bin
+
+clean:
+	rm -f bin/*.exe
+
+cleanall:
+	rm -rf bin obj
