@@ -5,10 +5,9 @@
 
 namespace physycom{
 
-  std::string replace_all_onthefly(const std::string &s, const std::string &old_, const std::string &new_) {
-    std::string r(s);
-    boost::replace_all(r, old_, new_);
-    return r;
+  std::string replace_all_onthefly(std::string s, const std::string &old_, const std::string &new_) {
+    boost::replace_all(s, old_, new_);
+    return s;
   }
 
 }   // end namespace physycom
