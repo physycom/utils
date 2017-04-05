@@ -1,5 +1,5 @@
-#ifndef PHYSYCOM_SPLIT_HPP
-#define PHYSYCOM_SPLIT_HPP
+#ifndef PHYSYCOM_UTILS_SPLIT_HPP
+#define PHYSYCOM_UTILS_SPLIT_HPP
 
 #include <vector>
 
