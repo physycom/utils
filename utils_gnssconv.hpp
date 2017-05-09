@@ -20,10 +20,6 @@ along with split. If not, see <http://www.gnu.org/licenses/>.
 #ifndef PHYSYCOM_UTILS_GNSSCONV_HPP
 #define PHYSYCOM_UTILS_GNSSCONV_HPP
 
-#ifndef _GNU_SOURCE      // enable M_PI in gcc
-#define _GNU_SOURCE
-#endif
-
 #include <iostream>
 #include <cmath>
 
