@@ -23,6 +23,10 @@ along with split. If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327950  // pi :)
+#endif
+
 namespace physycom{
 
   class Gnss_Coordinate{
