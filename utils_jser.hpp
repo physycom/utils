@@ -13,8 +13,8 @@ namespace physycom{
 	
 	// (De)Serialize JSON into class
 	template<class T>
-	vector<T> deserialize(const json &j){
-	  vector<T> trip(0);
+	std::vector<T> deserialize(const json &j){
+	  std::vector<T> trip(0);
 	  T point;
 	  if( j.is_array() ){
 	    for(const auto &r : j.array_range()){
@@ -30,7 +30,7 @@ namespace physycom{
 	}
 	
 	template<class T>
-	json serialize(const vector<T> &vec, char mode = 'a'){
+	json serialize(const std::vector<T> &vec, char mode = 'a'){
 	  json j;
 	  json r;
 	  if ( mode == 'a'){     // array
@@ -41,10 +41,10 @@ namespace physycom{
 	  }
 	  else if ( mode ==  'o'){
 	    size_t cnt = 0;
-	    string prefix = "record_";
+	    std::string prefix = "record_";
 	    for(const auto &r : vec){
-	      stringstream ss;
-	      ss << prefix << setw(5) << setfill('0') << endl;
+	      std::stringstream ss;
+	      ss << prefix << std::setw(5) << std::setfill('0') << std::endl;
 	      j[ss.str()] = r.to_json();
 	    }
 	  }
