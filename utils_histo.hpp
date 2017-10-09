@@ -25,6 +25,14 @@ namespace physycom{
       nbin = int((max - min) / binw);
     }
 
+    Histo_data(T min_, T max_, int nbin_)
+    {
+      min = min_;
+      max = max_;
+      nbin = nbin_;
+      binw = (max - min) / nbin;
+    }
+
     void populate()
     {
       for (auto label : data)
