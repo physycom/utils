@@ -42,7 +42,10 @@ namespace physycom{
         {
           int idx = int((d - min) / binw);
           idx = (idx < nbin) ? idx : nbin - 1;
-          counter[label.first][idx]++;
+          if (idx < 0) // to avoid segfault for inf and nan
+            counter[label.first][nbin-1]++;
+          else
+            counter[label.first][idx]++;
         }
       }
     }
