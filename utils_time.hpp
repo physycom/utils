@@ -157,3 +157,44 @@ std::string find_slot_mini_ranges(const std::string &date) {
   return slot;
 }
 
+// Returns a vector of string with the given ranges
+// E.G. "10.00-10.30" "10.30-11.00" ...
+std::vector<std::string> get_slot_auto_ranges_minutes(const std::string &time_min = "00:15", const std::string &time_max = "23:59", int dtmin = 30)
+{
+  std::vector<std::string> tok;
+  physycom::split(tok, time_min, ":", physycom::token_compress_off);
+  int tmin_min = stoi(tok[0]) * 60 + stoi(tok[1]);
+  physycom::split(tok, time_max, ":", physycom::token_compress_off);
+  int tmin_max = stoi(tok[0]) * 60 + stoi(tok[1]);
+
+  // prepare the output string
+  std::vector<std::string> slots;
+  int slot_num = (tmin_max - tmin_min) / dtmin;
+  for (int i = 0; i<slot_num; ++i)
+  {
+    int tmin_slot = tmin_min + i*dtmin;
+    int hi = tmin_slot / 60;
+    int mi = tmin_slot - hi * 60;
+    int hf, mf;
+    if (tmin_max > tmin_slot + dtmin)
+    {
+      hf = (tmin_slot + dtmin) / 60;
+      mf = tmin_slot + dtmin - hf * 60;
+    }
+    else
+    {
+      hf = tmin_max / 60;
+      mf = tmin_max - hf * 60;
+    }
+
+    std::stringstream slot;
+    slot
+      << std::setw(2) << std::setfill('0') << hi << "."
+      << std::setw(2) << std::setfill('0') << mi << "-"
+      << std::setw(2) << std::setfill('0') << hf << "."
+      << std::setw(2) << std::setfill('0') << mf;
+    slots.push_back(slot.str());
+  }
+
+  return slots;
+}
