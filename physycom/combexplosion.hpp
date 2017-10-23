@@ -18,16 +18,13 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
 
 
-
-
 #ifndef PHYSYCOM_UTILS_COMBEXPLOSION_HPP
 #define PHYSYCOM_UTILS_COMBEXPLOSION_HPP
-
 
 #include <vector>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
+#include <physycom/split.hpp>
 
 //////////////////////////////////////////////////////////////// STRINGIFICATION
 
@@ -94,19 +91,6 @@ std::vector<std::string> combo(const std::vector<std::vector<T>> &all)
 }
 
 template<typename T>
-T stoanything(const std::string &s){}
-
-template<> double stoanything(const std::string &s)
-{
-	return stod(s);
-}
-
-template<> int stoanything(const std::string &s)
-{
-	return stoi(s);
-}
-
-template<typename T>
 std::vector<std::vector<T>> combov(std::vector<std::vector<T>> all)
 {
 	auto comb = combo(all);
@@ -115,8 +99,8 @@ std::vector<std::vector<T>> combov(std::vector<std::vector<T>> all)
 	for(const auto &seq : comb)
 	{
 		std::vector<T> temp;
-		boost::split(tok, seq, boost::is_any_of(separator), boost::token_compress_off);
-		for( auto &val : tok) temp.push_back(stoanything<T>(val));
+		physycom::split(tok, seq, separator, physycom::token_compress_off);
+		for( auto &val : tok) temp.push_back(stoa<T>(val));
 		cv.push_back(temp);
 	} 
 	return cv;

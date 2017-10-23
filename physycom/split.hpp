@@ -25,7 +25,8 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 
 namespace physycom{
 
-	enum{
+	enum
+	{
 		token_compress_on,
 		token_compress_off
 	};
@@ -55,6 +56,27 @@ namespace physycom{
 				}
 			} 
 		}
+	}
+
+	template<typename T> T stoa(const std::string &s){}
+
+	template<> double stoa(const std::string &s)
+	{
+		return stod(s);
+	}
+	
+	template<> int stoa(const std::string &s)
+	{
+		return stoi(s);
+	}
+
+	template<typename T> 
+	std::vector<T> stov(const std::string &s, const std::string &sep = ",")
+	{
+		std::vector<T> v;
+		std::vector<std::string> tok;
+		physycom::split(tok, s, sep, physycom::token_compress_on);
+		for(const auto &t : tok) v.push_back(stoa<T>(t));
 	}
 
 }   // end namespace physycom

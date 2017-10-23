@@ -23,7 +23,7 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 
 #include <iomanip>
 #include <sstream>
-#include <utils_split.hpp>
+#include <physycom/split.hpp>
 
 using namespace std;
 
