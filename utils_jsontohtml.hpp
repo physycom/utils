@@ -1,6 +1,7 @@
 #ifndef UTILS_JSONTOHTML_HPP
 #define UTILS_JSONTOHTML_HPP
 
+#include <iomanip>
 #include <sstream>
 #include <utils_split.hpp>
 
@@ -46,14 +47,14 @@ border: 1px solid #999;
 <body>
 )";
 
-constexpr char STYLE_PNG[] = "mpng";
-constexpr char STYLE_REN[] = "mren";
+constexpr char STYLE_PNG[] = "png";
+constexpr char STYLE_REN[] = "ren";
 constexpr char STYLE_POLY[] = "poly";
 constexpr char STYLE_POLYREN[] = "polyren";
 constexpr char STYLE_POLYPNG[] = "polypng";
 vector<string> allowed_styles({STYLE_PNG, STYLE_REN, STYLE_POLY, STYLE_POLYREN, STYLE_POLYPNG});
 
-constexpr char STYLE_DEFAULT[] = "polyren";
+constexpr char STYLE_DEFAULT[] = "polypng";
 
 std::string HSLtoRGB(double hue, double sat, double light) 
 {
@@ -101,11 +102,12 @@ public:
   void digest(std::string raw_json);
   template<typename... Func> void push_file(std::string filename, Func... f);
   template<typename... Func> void push(std::string raw_json, Func... f);
-  template<typename... json_t> std::string get_html(json_t... jconf);
-  template<typename... json_t> void dump_html(std::string filename, json_t... jconf);
+  template<typename... json_t> void init_specs(std::string, json_t... jconf);
+  std::string get_html();
+  void dump_html(std::string filename);
 
 private:
-  template<typename... json_t> void init_specs(json_t... jconf);
+  int idx_new_trip;
   vector<string> colors_button, colors_text;
   vector<string> trip_tag, trip_style;
 };
@@ -145,13 +147,15 @@ template<typename... Func> void json_to_html::push(std::string raw_json, Func...
   // by making a tuple out of f... 
   // the function passed becomes callable
   auto tuplef = make_tuple(f...);
+  idx_new_trip = trips.size();
   get<0>(tuplef)();
-  records.clear();    
+  records.clear();
 }
 
 template<> void json_to_html::push(std::string raw_json)
 {
   digest(raw_json);
+  idx_new_trip = trips.size();
   trips.push_back(records);
   records.clear();
 }
@@ -170,49 +174,48 @@ template<> void json_to_html::push_file(std::string filename)
 }
 
 // utility wrapper for files 
-template<typename... json_t> void json_to_html::init_specs(json_t... jconf)
+template<typename... json_t> void json_to_html::init_specs(std::string tag, json_t... jspec)
 {
-  auto juplef = std::make_tuple(jconf...);
-  auto jptr = get<0>(juplef).begin_members();
-  for (int i = 0; i < (int)trips.size(); ++i) 
+  auto jtuple = std::make_tuple(jspec...);
+  auto js = get<0>(jtuple);
+  for (int i = idx_new_trip; i < (int)trips.size(); ++i) 
   {
-    if(jptr->value().has_member("color")) colors_button.push_back(jptr->value()["color"].as_string());
-    else colors_button.push_back(HSLtoRGB(i / double(trips.size()), 1, 0.4));
+    if(js.has_member("color")) colors_button.push_back(js["color"].as_string());
+    else colors_button.push_back("FF0000");
+    
     colors_text.push_back("000000");
-    if(jptr->value().has_member("style")) 
+
+    if(js.has_member("style")) 
     {
-      auto style = jptr->value()["style"].as_string();
+      auto style = js["style"].as_string();
       if( physycom::belongs_to(style,allowed_styles) ) trip_style.push_back(style);
       else 
       {
-        cerr << "WARNING: Style \"" << style << "\" unknown. Setting to default." << endl;
+        cerr << "WARNING: Style \"" << style << "\" unknown. Setting to default(" << STYLE_DEFAULT << ")" << endl;
         trip_style.push_back(STYLE_DEFAULT);
       }
     }
     else trip_style.push_back(STYLE_DEFAULT);
     
-    trip_tag.push_back(jptr->key());
-    jptr++;
+    trip_tag.push_back(tag + ( (trips.size() - idx_new_trip == 1) ? string("") : ("_" + std::to_string(i))));
   }
 }
 
 template<>
-void json_to_html::init_specs()
+void json_to_html::init_specs(std::string tag)
 {
-  for (int i = 0; i < (int)trips.size(); ++i) 
+  for (int i = idx_new_trip; i < (int)trips.size(); ++i) 
   {
-    colors_button.push_back(HSLtoRGB(i / double(trips.size()), 1, 0.4));
-    //colors_button.push_back("FF0000");
+    colors_button.push_back("0000FF");
     colors_text.push_back("000000");
     trip_style.push_back(STYLE_DEFAULT);
-    trip_tag.push_back("Trip " + to_string(i+1));
+    trip_tag.push_back(tag + ( (trips.size() - idx_new_trip == 1) ? string("") : ("_" + std::to_string(i))));
   }
 }
 
-template<typename... json_t> 
-std::string json_to_html::get_html(json_t... jconf)
+std::string json_to_html::get_html()
 {
-  init_specs(jconf...);
+  if( trips.size() == 0 ) throw std::runtime_error("Empty trip vector");
 
   std::stringstream output;
   output << html_header;
@@ -467,12 +470,11 @@ std::string json_to_html::get_html(json_t... jconf)
   return output.str();
 }
 
-template<typename... json_t>
-void json_to_html::dump_html(std::string filename, json_t... jconf)
+void json_to_html::dump_html(std::string filename)
 {
   ofstream html(filename);
   if(!html) throw std::runtime_error("Unable to create output file : " + filename);
-  html << get_html(jconf...) << endl;
+  html << get_html() << endl;
   html.close();
 }
 
