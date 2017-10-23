@@ -1,28 +1,30 @@
-/* Copyright 2015 - Alessandro Fabbri, Stefano Sinigardi */
+/* Copyright 2015-2017 - Alessandro Fabbri, Stefano Sinigardi */
 
 /***************************************************************************
-This file is part of gnss_conversion.
+This file is part of utils.
 
-gnss_conversion is free software : you can redistribute it and / or modify
+utils is free software : you can redistribute it and / or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-gnss_conversion is distributed in the hope that it will be useful,
+utils is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with gnss_conversion. If not, see <http://www.gnu.org/licenses/>.
+along with utils. If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
+
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 
 #include <iostream>
 #include <iomanip>
-#include "../utils_gnssconv.hpp"
+#include "physycom/gnssconv.hpp"
 
 using namespace physycom;
 
