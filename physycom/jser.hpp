@@ -29,11 +29,10 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 // To use it you must provide a valid
 // json type (e.g using using)
 
-template<typename json_t>
 namespace physycom
 {	
 	// (De)Serialize JSON into class
-	template<class T>
+	template<typename json_t, class T>
 	std::vector<T> deserialize(const json_t &j)
 	{
 	  std::vector<T> trip(0);
@@ -47,7 +46,7 @@ namespace physycom
 	  return trip;
 	}
 	
-	template<class T>
+	template<typename json_t, class T>
 	json_t serialize(const std::vector<T> &vec, char mode = 'a'){
 	  json_t j;
 	  json_t r;
