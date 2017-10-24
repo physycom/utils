@@ -40,14 +40,15 @@ namespace physycom
 	  if( j.is_array() )
 	    for(const auto &r : j.array_range())
 	      trip.emplace_back(r);
-	  else if ( j.is_object() ){
+	  else if ( j.is_object() )
 	    for(const auto &r : j.object_range())
 	      trip.emplace_back(r.value());
 	  return trip;
 	}
 	
 	template<typename json_t, class T>
-	json_t serialize(const std::vector<T> &vec, char mode = 'a'){
+	json_t serialize(const std::vector<T> &vec, char mode = 'a')
+	{
 	  json_t j;
 	  json_t r;
 	  if ( mode == 'a')      // array

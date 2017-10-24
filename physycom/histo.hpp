@@ -25,8 +25,8 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <fstream>
 
-namespace physycom{
-
+namespace physycom
+{
   template<typename T>
   struct Histo_data
   {
@@ -70,12 +70,12 @@ namespace physycom{
       }
     }
 
-    void dump(const std::string &filename)
+    void gnuplot(const std::string &filename)
     {
       std::ofstream outhisto(filename);
       outhisto << "#   bin   #  ";
       for (auto label : counter) outhisto << label.first << "  #  ";
-      outhisto << endl;
+      outhisto << std::endl;
       for (int i = 0; i < nbin; ++i)
       {
         outhisto << i*binw << "\t";
