@@ -30,10 +30,10 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 // json type (e.g using using)
 
 namespace physycom
-{	
+{
 	// (De)Serialize JSON into class
 	template<typename json_t, class T>
-	std::vector<T> deserialize(const json_t &j)
+	std::vector<T> deserialize(const json_t j)
 	{
 	  std::vector<T> trip(0);
 	  T point;
@@ -45,7 +45,7 @@ namespace physycom
 	      trip.emplace_back(r.value());
 	  return trip;
 	}
-	
+
 	template<typename json_t, class T>
 	json_t serialize(const std::vector<T> &vec, char mode = 'a')
 	{
@@ -53,7 +53,7 @@ namespace physycom
 	  json_t r;
 	  if ( mode == 'a')      // array
 	  {
-	    j = json::array();
+	    j = json_t::array();
 	    for(const auto &r : vec)
 	      j.add(r.to_json());
 	  }
@@ -71,7 +71,7 @@ namespace physycom
 	  else throw std::runtime_error("JSON is not array nor object");
 	  return j;
 	}
-	
+
 }   // end namespace physycom
 
 #endif // PHYSYCOM_UTILS_JSER_HPP
