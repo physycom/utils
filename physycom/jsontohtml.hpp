@@ -23,6 +23,7 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 
 #include <iomanip>
 #include <sstream>
+#include <type_traits>
 #include <physycom/split.hpp>
 
 using namespace std;
@@ -110,19 +111,20 @@ std::string HSLtoRGB(double hue, double sat, double light)
   return stream.str();
 };
 
+template<typename a_json>
 class json_to_html
 {
 public:
   bool export_map, verbose;
   int undersampling;
-  vector<vector<jsoncons::json>> trips;
-  vector<jsoncons::json> records;
+  vector<vector<a_json>> trips;
+  vector<a_json> records;
 
   json_to_html(bool export_map_ = false, bool verbose = true, int undersampling_ = 1);
   void digest(std::string raw_json);
-  template<typename... Func> void push_file(std::string filename, Func... f);
-  template<typename... Func> void push(std::string raw_json, Func... f);
-  template<typename... json_t> void init_specs(std::string, json_t... jconf);
+  template<typename Func> void push_file(std::string filename, Func f = [](){} );
+  template<typename Func> void push(std::string raw_json, Func f = [](){} );
+  template<typename json_t> void init_specs(std::string, json_t jspec = json_t("{ \"color\" : \"0000FF\", \"style\" : \"polyren\" }"));
   std::string get_html();
   void dump_html(std::string filename);
 
@@ -132,7 +134,8 @@ private:
   vector<string> trip_tag, trip_style;
 };
 
-json_to_html::json_to_html(bool export_map_, bool verbose_, int undersampling_)
+template<typename a_json>
+json_to_html<a_json>::json_to_html(bool export_map_, bool verbose_, int undersampling_)
 {
   export_map = export_map_;
   verbose = verbose_;
@@ -141,7 +144,8 @@ json_to_html::json_to_html(bool export_map_, bool verbose_, int undersampling_)
 
 // store the original json data
 // according to obj or arr
-void json_to_html::digest(std::string raw_json)
+template<typename a_json>
+void json_to_html<a_json>::digest(std::string raw_json)
 {
   jsoncons::json _records = jsoncons::json::parse(raw_json);
   vector<jsoncons::json> temp_trip;
@@ -161,53 +165,42 @@ void json_to_html::digest(std::string raw_json)
 
 // variadic push raw json string to trips
 // accepts a lambda for splitting function
-template<typename... Func> void json_to_html::push(std::string raw_json, Func... f)
+template<typename a_json>
+template<typename Func> 
+void json_to_html<a_json>::push(std::string raw_json, Func f)
 {
   digest(raw_json);
   // by making a tuple out of f... 
   // the function passed becomes callable
-  auto tuplef = make_tuple(f...);
   idx_new_trip = trips.size();
-  get<0>(tuplef)();
-  records.clear();
-}
-
-template<> void json_to_html::push(std::string raw_json)
-{
-  digest(raw_json);
-  idx_new_trip = trips.size();
-  trips.push_back(records);
+  f();
   records.clear();
 }
 
 // utility wrapper for files 
-template<typename... Func> void json_to_html::push_file(std::string filename, Func... f)
+template<typename a_json>
+template<typename Func> 
+void json_to_html<a_json>::push_file(std::string filename, Func f)
 {
   jsoncons::json _records = jsoncons::json::parse_file(filename);
-  push(_records.to_string(), f...);
-}
-
-template<> void json_to_html::push_file(std::string filename)
-{
-  jsoncons::json _records = jsoncons::json::parse_file(filename);
-  push(_records.to_string());
+  push(_records.to_string(), f);
 }
 
 // utility wrapper for files 
-template<typename... json_t> void json_to_html::init_specs(std::string tag, json_t... jspec)
+template<typename a_json>
+template<typename json_t> 
+void json_to_html<a_json>::init_specs(std::string tag, json_t jspec)
 {
-  auto jtuple = std::make_tuple(jspec...);
-  auto js = get<0>(jtuple);
   for (int i = idx_new_trip; i < (int)trips.size(); ++i) 
   {
-    if(js.has_member("color")) colors_button.push_back(js["color"].as_string());
+    if(jspec.has_member("color")) colors_button.push_back(jspec["color"].as_string());
     else colors_button.push_back("FF0000");
     
     colors_text.push_back("000000");
 
-    if(js.has_member("style")) 
+    if(jspec.has_member("style")) 
     {
-      auto style = js["style"].as_string();
+      auto style = jspec["style"].as_string();
       if( physycom::belongs_to(style,allowed_styles) ) trip_style.push_back(style);
       else 
       {
@@ -221,19 +214,8 @@ template<typename... json_t> void json_to_html::init_specs(std::string tag, json
   }
 }
 
-template<>
-void json_to_html::init_specs(std::string tag)
-{
-  for (int i = idx_new_trip; i < (int)trips.size(); ++i) 
-  {
-    colors_button.push_back("0000FF");
-    colors_text.push_back("000000");
-    trip_style.push_back(STYLE_DEFAULT);
-    trip_tag.push_back(tag + ( (trips.size() - idx_new_trip == 1) ? string("") : ("_" + std::to_string(i))));
-  }
-}
-
-std::string json_to_html::get_html()
+template<typename a_json>
+std::string json_to_html<a_json>::get_html()
 {
   if( trips.size() == 0 ) throw std::runtime_error("Empty trip vector");
 
@@ -265,26 +247,26 @@ std::string json_to_html::get_html()
       if (verbose) 
       {
         if (trips[i][j].has_member("date"))
-          tooltip = "date: " + trips[i][j].at("date").as<string>();
+          tooltip = "date: " + trips[i][j].at("date").template as<std::string>();
         if (trips[i][j].has_member("alt"))
-          tooltip += "<br />altitude: " + trips[i][j].at("alt").as<string>();
+          tooltip += "<br />altitude: " + trips[i][j].at("alt").template as<std::string>();
         if (trips[i][j].has_member("delta_dist"))
-          tooltip += "<br />ds (m): " + trips[i][j].at("delta_dist").as<string>();
+          tooltip += "<br />ds (m): " + trips[i][j].at("delta_dist").template as<std::string>();
         if (trips[i][j].has_member("timestamp")) 
         {
           try 
           {
-            if (j != 0) last_timestamp = trips[i][j - 1].at("timestamp").as<unsigned int>();
+            if (j != 0) last_timestamp = trips[i][j - 1].at("timestamp").template as<unsigned int>();
             else last_timestamp = 0;
-            tooltip += "<br />timestamp: " + to_string(trips[i][j].at("timestamp").as<unsigned int>());
-            tooltip += "<br />dt (s): " + to_string(trips[i][j].at("timestamp").as<unsigned int>() - last_timestamp);
+            tooltip += "<br />timestamp: " + to_string(trips[i][j].at("timestamp").template as<unsigned int>());
+            tooltip += "<br />dt (s): " + to_string(trips[i][j].at("timestamp").template as<unsigned int>() - last_timestamp);
           }
           catch (...) 
           {
             // old format compatibility (crash avoiding)
             try 
             {
-              tooltip += "<br />date:" + trips[i][j].at("timestamp").as<string>();
+              tooltip += "<br />date:" + trips[i][j].at("timestamp").template as<std::string>();
             }
             catch (...) {
               tooltip += "<br />timestamp: NA";
@@ -292,28 +274,28 @@ std::string json_to_html::get_html()
           }
         }
         if (trips[i][j].has_member("heading"))
-          tooltip += "<br />heading: " + trips[i][j].at("heading").as<string>();
+          tooltip += "<br />heading: " + trips[i][j].at("heading").template as<std::string>();
         if (trips[i][j].has_member("speed"))
-          tooltip += "<br />speed: " + trips[i][j].at("speed").as<string>();
+          tooltip += "<br />speed: " + trips[i][j].at("speed").template as<std::string>();
         if (trips[i][j].has_member("enabling"))
-          tooltip += "<br />cause: " + trips[i][j].at("enabling").as<string>();
+          tooltip += "<br />cause: " + trips[i][j].at("enabling").template as<std::string>();
         if (trips[i][j].has_member("tracking_glonass")) 
         {
-          tooltip += "<br />glonass sats (used/seen): " + trips[i][j].at("using_glonass").as<string>() + " / " + trips[i][j].at("tracking_glonass").as<string>();
-          tooltip += "<br />gps sats (used/seen): " + trips[i][j].at("using_gps").as<string>() + " / " + trips[i][j].at("tracking_gps").as<string>();
-          tooltip += "<br />total sats (used/seen): " + trips[i][j].at("using_total").as<string>() + " / " + trips[i][j].at("tracking_total").as<string>();
+          tooltip += "<br />glonass sats (used/seen): " + trips[i][j].at("using_glonass").template as<std::string>() + " / " + trips[i][j].at("tracking_glonass").template as<std::string>();
+          tooltip += "<br />gps sats (used/seen): " + trips[i][j].at("using_gps").template as<std::string>() + " / " + trips[i][j].at("tracking_gps").template as<std::string>();
+          tooltip += "<br />total sats (used/seen): " + trips[i][j].at("using_total").template as<std::string>() + " / " + trips[i][j].at("tracking_total").template as<std::string>();
         }
         if (trips[i][j].has_member("fix"))
-          tooltip += "<br />fix: " + trips[i][j].at("fix").as<string>();
+          tooltip += "<br />fix: " + trips[i][j].at("fix").template as<std::string>();
         if (trips[i][j].has_member("global_index"))
-          tooltip += "<br />global index: " + trips[i][j].at("global_index").as<string>();
+          tooltip += "<br />global index: " + trips[i][j].at("global_index").template as<std::string>();
       }
       output
       << "["
       << fixed << setprecision(6)
-      << (trips[i][j].has_member("lat") ? trips[i][j].at("lat").as<double>() : 90.0)
+      << (trips[i][j].has_member("lat") ? trips[i][j].at("lat").template as<double>() : 90.0)
       << ","
-      << (trips[i][j].has_member("lon") ? trips[i][j].at("lon").as<double>() : 0.0)
+      << (trips[i][j].has_member("lon") ? trips[i][j].at("lon").template as<double>() : 0.0)
       << ",'<p>"
       << tooltip
       << "</p>']"
@@ -490,7 +472,8 @@ std::string json_to_html::get_html()
   return output.str();
 }
 
-void json_to_html::dump_html(std::string filename)
+template<typename a_json>
+void json_to_html<a_json>::dump_html(std::string filename)
 {
   ofstream html(filename);
   if(!html) throw std::runtime_error("Unable to create output file : " + filename);
