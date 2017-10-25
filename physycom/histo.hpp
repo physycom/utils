@@ -28,16 +28,16 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 namespace physycom
 {
   template<typename T>
-  struct Histo_data
+  struct histo
   {
     std::map<std::string, std::vector<T>> data;
     std::map<std::string, std::vector<int>> counter;
     T min, max, binw;
     int nbin;
 
-    Histo_data() {};
+    histo() {};
 
-    Histo_data(T min_, T max_, T binw_)
+    histo(T min_, T max_, T binw_)
     {
       min = min_;
       max = max_;
@@ -45,7 +45,9 @@ namespace physycom
       nbin = int((max - min) / binw);
     }
 
-    Histo_data(T min_, T max_, int nbin_)
+    // this won't compile with int data
+    // but it's handy for floating point
+    histo(T min_, T max_, int nbin_)
     {
       min = min_;
       max = max_;
@@ -70,22 +72,22 @@ namespace physycom
       }
     }
 
-    void gnuplot(const std::string &filename)
+    void dump(const std::string &filename)
     {
       std::ofstream outhisto(filename);
-      outhisto << "#   bin   #  ";
-      for (auto label : counter) outhisto << label.first << "  #  ";
+      outhisto << "  bin  ";
+      for (const auto &label : counter) outhisto << label.first << "  ";
       outhisto << std::endl;
       for (int i = 0; i < nbin; ++i)
       {
         outhisto << i*binw << "\t";
-        for (auto label : counter) outhisto << counter[label.first][i] << "\t";
+        for (const auto &label : counter) outhisto << counter[label.first][i] << "\t";
         outhisto << std::endl;
       }
       outhisto.close();
     }
 
-    void gnuplot(const std::string &filename)
+    void gnuplot(const std::string &filename) const
     {
       std::string basename = filename.substr(0, filename.find_last_of("."));
       std::ofstream outplt(filename);
@@ -133,6 +135,17 @@ plot ')" << basename << R"(.txt')";
       outplt.close();
     }
 
+  };
+
+  template<typename T> 
+  struct multihisto
+  {
+    std::map<std::string, histo<T>> hs;
+    void add_histo(std::string name, T min, T max, T binw) { hs[name] = histo<T>(min, max, binw); }
+    void push(std::string name, std::string tag, T t) { hs[name].data[tag].push_back(t); }
+    void populate() { for(auto &h : hs) h.second.populate(); }
+    void dump() { for(auto &h : hs) h.second.dump("histo_" + h.first + ".txt"); }
+    void gnuplot() { for(auto &h : hs) h.second.gnuplot("histo_" + h.first + ".plt"); }
   };
 
 }   // end namespace physycom
