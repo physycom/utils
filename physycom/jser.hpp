@@ -53,7 +53,7 @@ namespace physycom
 	  json_t r;
 	  if ( mode == 'a')      // array
 	  {
-	    j = json_t::array();
+	    j = typename json_t::array();
 	    for(const auto &r : vec)
 	      j.add(r.to_json());
 	  }
