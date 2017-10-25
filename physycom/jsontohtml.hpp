@@ -26,17 +26,15 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 #include <type_traits>
 #include <physycom/split.hpp>
 
-using namespace std;
-
 const std::string html_header =
 R"(
 <!DOCTYPE html>
-<html> 
-<head> 
-<meta http-equiv="content-type" content="text/html; charset=UTF-8" /> 
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <title>
-Display TRIP 
-</title> 
+Display TRIP
+</title>
 <style>
 html, body, #map-canvas {
   height: 100%;
@@ -59,11 +57,11 @@ border: 1px solid #999;
 <script type="text/javascript" src="https://cdn.rawgit.com/physycom/ruler/9f9ad71c/markerwithlabel.js"></script>
 <script type="text/javascript" src="https://cdn.rawgit.com/physycom/ruler/9f9ad71c/ContextMenu.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/physycom/ruler/9f9ad71c/ruler_map.css">
-<script type="text/javascript" src="https://cdn.rawgit.com/physycom/ruler/9f9ad71c/ruler_map.js"></script>   
+<script type="text/javascript" src="https://cdn.rawgit.com/physycom/ruler/9f9ad71c/ruler_map.js"></script>
 <!-- Remote png libraries -->
 <script type="text/javascript" src="https://github.com/niklasvh/html2canvas/releases/download/0.4.1/html2canvas.js"></script>
-<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js" ></script>   
-</head> 
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js" ></script>
+</head>
 
 <body>
 )";
@@ -73,11 +71,11 @@ constexpr char STYLE_REN[] = "ren";
 constexpr char STYLE_POLY[] = "poly";
 constexpr char STYLE_POLYREN[] = "polyren";
 constexpr char STYLE_POLYPNG[] = "polypng";
-vector<string> allowed_styles({STYLE_PNG, STYLE_REN, STYLE_POLY, STYLE_POLYREN, STYLE_POLYPNG});
+std::vector<std::string> allowed_styles({STYLE_PNG, STYLE_REN, STYLE_POLY, STYLE_POLYREN, STYLE_POLYPNG});
 
 constexpr char STYLE_DEFAULT[] = "polypng";
 
-std::string HSLtoRGB(double hue, double sat, double light) 
+std::string HSLtoRGB(double hue, double sat, double light)
 {
   double red, green, blue;
   red = green = blue = light;                     // grey is default
@@ -111,31 +109,31 @@ std::string HSLtoRGB(double hue, double sat, double light)
   return stream.str();
 };
 
-template<typename a_json>
+template<typename json_t>
 class json_to_html
 {
 public:
   bool export_map, verbose;
   int undersampling;
-  vector<vector<a_json>> trips;
-  vector<a_json> records;
+  std::vector<std::vector<json_t>> trips;
+  std::vector<json_t> records;
 
   json_to_html(bool export_map_ = false, bool verbose = true, int undersampling_ = 1);
   void digest(std::string raw_json);
   template<typename Func> void push_file(std::string filename, Func f = [](){} );
   template<typename Func> void push(std::string raw_json, Func f = [](){} );
-  template<typename json_t> void init_specs(std::string, json_t jspec = json_t("{ \"color\" : \"0000FF\", \"style\" : \"polyren\" }"));
+  void init_specs(std::string, json_t jspec = json_t("{ \"color\" : \"0000FF\", \"style\" : \"polyren\" }"));
   std::string get_html();
   void dump_html(std::string filename);
 
 private:
   int idx_new_trip;
-  vector<string> colors_button, colors_text;
-  vector<string> trip_tag, trip_style;
+  std::vector<std::string> colors_button, colors_text;
+  std::vector<std::string> trip_tag, trip_style;
 };
 
-template<typename a_json>
-json_to_html<a_json>::json_to_html(bool export_map_, bool verbose_, int undersampling_)
+template<typename json_t>
+json_to_html<json_t>::json_to_html(bool export_map_, bool verbose_, int undersampling_)
 {
   export_map = export_map_;
   verbose = verbose_;
@@ -144,20 +142,20 @@ json_to_html<a_json>::json_to_html(bool export_map_, bool verbose_, int undersam
 
 // store the original json data
 // according to obj or arr
-template<typename a_json>
-void json_to_html<a_json>::digest(std::string raw_json)
+template<typename json_t>
+void json_to_html<json_t>::digest(std::string raw_json)
 {
   jsoncons::json _records = jsoncons::json::parse(raw_json);
-  vector<jsoncons::json> temp_trip;
+  std::vector<jsoncons::json> temp_trip;
   if (_records.size() == 0) throw std::runtime_error("Empty input JSON");
-  if (_records.is_array()) 
+  if (_records.is_array())
   {
-    for (size_t k = 0; k < _records.size(); ++k) 
-      records.push_back(_records[k]);    
+    for (size_t k = 0; k < _records.size(); ++k)
+      records.push_back(_records[k]);
   }
-  else if (_records.is_object()) 
+  else if (_records.is_object())
   {
-    for (auto it = _records.begin_members(); it != _records.end_members(); ++it) 
+    for (auto it = _records.begin_members(); it != _records.end_members(); ++it)
       records.push_back(it->value());
   }
   else throw std::runtime_error("JSON is not array nor object");
@@ -165,12 +163,12 @@ void json_to_html<a_json>::digest(std::string raw_json)
 
 // variadic push raw json string to trips
 // accepts a lambda for splitting function
-template<typename a_json>
+template<typename json_t>
 template<typename Func> 
-void json_to_html<a_json>::push(std::string raw_json, Func f)
+void json_to_html<json_t>::push(std::string raw_json, Func f)
 {
   digest(raw_json);
-  // by making a tuple out of f... 
+  // by making a tuple out of f...
   // the function passed becomes callable
   idx_new_trip = trips.size();
   f();
@@ -178,73 +176,72 @@ void json_to_html<a_json>::push(std::string raw_json, Func f)
 }
 
 // utility wrapper for files 
-template<typename a_json>
+template<typename json_t>
 template<typename Func> 
-void json_to_html<a_json>::push_file(std::string filename, Func f)
+void json_to_html<json_t>::push_file(std::string filename, Func f)
 {
   jsoncons::json _records = jsoncons::json::parse_file(filename);
   push(_records.to_string(), f);
 }
 
 // utility wrapper for files 
-template<typename a_json>
-template<typename json_t> 
-void json_to_html<a_json>::init_specs(std::string tag, json_t jspec)
+template<typename json_t>
+void json_to_html<json_t>::init_specs(std::string tag, json_t jspec)
 {
   for (int i = idx_new_trip; i < (int)trips.size(); ++i) 
   {
     if(jspec.has_member("color")) colors_button.push_back(jspec["color"].as_string());
     else colors_button.push_back("FF0000");
-    
+
     colors_text.push_back("000000");
 
     if(jspec.has_member("style")) 
     {
       auto style = jspec["style"].as_string();
       if( physycom::belongs_to(style,allowed_styles) ) trip_style.push_back(style);
-      else 
+      else
       {
-        cerr << "WARNING: Style \"" << style << "\" unknown. Setting to default(" << STYLE_DEFAULT << ")" << endl;
+        std::cerr << "WARNING: Style \"" << style << "\" unknown. Setting to default(" << STYLE_DEFAULT << ")" << std::endl;
         trip_style.push_back(STYLE_DEFAULT);
       }
     }
     else trip_style.push_back(STYLE_DEFAULT);
-    
-    trip_tag.push_back(tag + ( (trips.size() - idx_new_trip == 1) ? string("") : ("_" + std::to_string(i))));
+
+    trip_tag.push_back(tag + ( (trips.size() - idx_new_trip == 1) ? std::string("") : ("_" + std::to_string(i))));
   }
 }
 
-template<typename a_json>
-std::string json_to_html<a_json>::get_html()
+template<typename json_t>
+std::string json_to_html<json_t>::get_html()
 {
   if( trips.size() == 0 ) throw std::runtime_error("Empty trip vector");
 
   std::stringstream output;
   output << html_header;
-  output << R"(    
+  output << R"(
   <div id="map" style="width: )" << (export_map?"600px":"100%") << R"(; height: )" << (export_map ? "600px" : "100%") << R"(;"></div>
 
   <script type="text/javascript">
   )";
-  for (size_t i = 0; i < trips.size(); ++i) 
+  for (size_t i = 0; i < trips.size(); ++i)
   {
-    output << "\t\t\tvar Trajectory_trip_" << i << ";" << endl;
-    output << "\t\t\tvar Markers_trip_" << i << " = [];" << endl;
-    output << "\t\t\tvar PolyPath_trip_" << i << " = [];" << endl;
+    output << "\t\t\tvar Trajectory_trip_" << i << ";" << std::endl;
+    output << "\t\t\tvar Markers_trip_" << i << " = [];" << std::endl;
+    output << "\t\t\tvar PolyPath_trip_" << i << " = [];" << std::endl;
   }
-  output << endl << "\t\t\tvar map;" << endl << endl;
-  output << "\t\t\tfunction initialize(){" << endl;
-  for (size_t i = 0; i < trips.size(); i++) 
+  output << std::endl << "\t\t\tvar map;" << std::endl << std::endl;
+  output << "\t\t\tfunction initialize(){" << std::endl;
+  for (size_t i = 0; i < trips.size(); i++)
   {
-    output << endl << "\t\t\t\tvar Locations_trip_" << i << " = [" << endl;
-    // start of gps points 
+    output << std::endl << "\t\t\t\tvar Locations_trip_" << i << " = [" << std::endl;
+    // start of gps points
     unsigned int last_timestamp = 0;
-    for (size_t j = 0; j < trips[i].size(); j++) 
+    for (size_t j = 0; j < trips[i].size(); j++)
     {
       if (j % undersampling) continue;
-      string tooltip("#" + to_string(j));
-      
-      if (verbose) 
+      std::string tooltip("#" + std::to_string(j));
+
+      if (verbose)
       {
         if (trips[i][j].has_member("date"))
           tooltip = "date: " + trips[i][j].at("date").template as<std::string>();
@@ -254,17 +251,17 @@ std::string json_to_html<a_json>::get_html()
           tooltip += "<br />ds (m): " + trips[i][j].at("delta_dist").template as<std::string>();
         if (trips[i][j].has_member("timestamp")) 
         {
-          try 
+          try
           {
             if (j != 0) last_timestamp = trips[i][j - 1].at("timestamp").template as<unsigned int>();
             else last_timestamp = 0;
-            tooltip += "<br />timestamp: " + to_string(trips[i][j].at("timestamp").template as<unsigned int>());
-            tooltip += "<br />dt (s): " + to_string(trips[i][j].at("timestamp").template as<unsigned int>() - last_timestamp);
+            tooltip += "<br />timestamp: " + std::to_string(trips[i][j].at("timestamp").template as<unsigned int>());
+            tooltip += "<br />dt (s): " + std::to_string(trips[i][j].at("timestamp").template as<unsigned int>() - last_timestamp);
           }
-          catch (...) 
+          catch (...)
           {
             // old format compatibility (crash avoiding)
-            try 
+            try
             {
               tooltip += "<br />date:" + trips[i][j].at("timestamp").template as<std::string>();
             }
@@ -292,7 +289,7 @@ std::string json_to_html<a_json>::get_html()
       }
       output
       << "["
-      << fixed << setprecision(6)
+      << std::fixed << std::setprecision(6)
       << (trips[i][j].has_member("lat") ? trips[i][j].at("lat").template as<double>() : 90.0)
       << ","
       << (trips[i][j].has_member("lon") ? trips[i][j].at("lon").template as<double>() : 0.0)
@@ -300,10 +297,10 @@ std::string json_to_html<a_json>::get_html()
       << tooltip
       << "</p>']"
       << (j != trips[i].size() - 1 ? ',' : ' ')
-      << endl;
+      << std::endl;
     }
     // end of gps points
-    output << "\t\t\t\t]" << endl;
+    output << "\t\t\t\t]" << std::endl;
   }
   output << R"(
   map = new google.maps.Map(document.getElementById('map'), {
@@ -315,19 +312,19 @@ std::string json_to_html<a_json>::get_html()
   var Marker, i;
   var bounds = new google.maps.LatLngBounds();
 )";
-  
-  for (size_t i = 0; i < trips.size(); i++) 
+
+  for (size_t i = 0; i < trips.size(); i++)
   {
-    output << "//////////////////////////////////////////////////////// TRIP " << i << endl;
+    output << "//////////////////////////////////////////////////////// TRIP " << i << std::endl;
     output << R"(
-  for (i = 0; i<Locations_trip_)" << i << R"(.length; i++) 
+  for (i = 0; i<Locations_trip_)" << i << R"(.length; i++)
   {
     var point = new google.maps.LatLng( Locations_trip_)" << i << "[i][0], Locations_trip_" << i << R"([i][1] )
 
     bounds.extend(point);
     )";
-    
-    if (trip_style[i] == STYLE_PNG || trip_style[i] == STYLE_POLYPNG) 
+
+    if (trip_style[i] == STYLE_PNG || trip_style[i] == STYLE_POLYPNG)
     {
       output << R"(
     var marker_url;
@@ -354,7 +351,7 @@ std::string json_to_html<a_json>::get_html()
 )";
     }
 
-    if (trip_style[i] == STYLE_REN || trip_style[i] == STYLE_POLYREN) 
+    if (trip_style[i] == STYLE_REN || trip_style[i] == STYLE_POLYREN)
     {
       output << R"(
     Marker = new google.maps.Marker({
@@ -386,7 +383,7 @@ std::string json_to_html<a_json>::get_html()
   }
 )";
 
-    if (trip_style[i] != STYLE_REN && trip_style[i] != STYLE_PNG) 
+    if (trip_style[i] != STYLE_REN && trip_style[i] != STYLE_PNG)
     {
       output << R"(
   for (i = 0; i<Locations_trip_)" << i << R"(.length; i++) {
@@ -401,30 +398,30 @@ std::string json_to_html<a_json>::get_html()
   });)";
       output << R"(
   Trajectory_trip_)" << i << R"(.setMap(map);
-      
+
 )";
     }
   }
-  output << endl << "\t\t\t\tmap.fitBounds(bounds);" << endl;
-  output << "\t\t\t\truler_map = new RulerMap(map)" << endl;
+  output << std::endl << "\t\t\t\tmap.fitBounds(bounds);" << std::endl;
+  output << "\t\t\t\truler_map = new RulerMap(map)" << std::endl;
 
-  if (export_map) 
+  if (export_map)
   {
     output << R"(
     google.maps.event.addListenerOnce(map, 'tilesloaded', function(){
       setTimeout(saveImage, 1000);
-    }); 
+    });
 
     )";
   }
 
-  output << "\t\t}" << endl;
-  for (size_t i = 0; i < trips.size(); i++) 
+  output << "\t\t}" << std::endl;
+  for (size_t i = 0; i < trips.size(); i++)
   {
     output << R"(
-    function toggle_trip_)" << i << "(){" << endl;
+    function toggle_trip_)" << i << "(){" << std::endl;
     if (trip_style[i] == STYLE_POLYREN || trip_style[i] == STYLE_POLYPNG || trip_style[i] == STYLE_POLY) output << R"(
-      Trajectory_trip_)" << i << ".setMap(Trajectory_trip_" << i << ".getMap() ? null : map);" << endl;
+      Trajectory_trip_)" << i << ".setMap(Trajectory_trip_" << i << ".getMap() ? null : map);" << std::endl;
     if (trip_style[i] != STYLE_POLY ) output << R"(
       for (i = 0; i < Markers_trip_)" << i << R"(.length; i++) {
         var mark = Markers_trip_)" << i << R"([i];
@@ -434,7 +431,7 @@ std::string json_to_html<a_json>::get_html()
     })";
   }
 
-  if (export_map) 
+  if (export_map)
   {
     output << R"(
     function saveImage(){
@@ -448,7 +445,7 @@ std::string json_to_html<a_json>::get_html()
           pom.click();
           setTimeout(function(){ window.close(); }, 3000);
         }
-      }); 
+      });
     }
     )";
   }
@@ -459,10 +456,10 @@ std::string json_to_html<a_json>::get_html()
   </script>
   <div id = "panel">
   )";
-  for (size_t i = 0; i < trips.size(); ++i) 
+  for (size_t i = 0; i < trips.size(); ++i)
   {
-    output << "\t\t\t<button onclick = \"toggle_trip_" << i 
-           << "()\" style = \"background-color:#" << colors_button[i] << "; color:#" << colors_text[i] << "\">" << trip_tag[i] << "</button>" << endl;
+    output << "\t\t\t<button onclick = \"toggle_trip_" << i
+           << "()\" style = \"background-color:#" << colors_button[i] << "; color:#" << colors_text[i] << "\">" << trip_tag[i] << "</button>" << std::endl;
   }
   output << R"(    </div>
   </body>
@@ -472,12 +469,12 @@ std::string json_to_html<a_json>::get_html()
   return output.str();
 }
 
-template<typename a_json>
-void json_to_html<a_json>::dump_html(std::string filename)
+template<typename json_t>
+void json_to_html<json_t>::dump_html(std::string filename)
 {
-  ofstream html(filename);
+  std::ofstream html(filename);
   if(!html) throw std::runtime_error("Unable to create output file : " + filename);
-  html << get_html() << endl;
+  html << get_html() << std::endl;
   html.close();
 }
 

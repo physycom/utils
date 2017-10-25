@@ -2902,8 +2902,8 @@ namespace Catch {
 
 @optional
 
--(void) setUp;
--(void) tearDown;
+-() setUp;
+-() tearDown;
 
 @end
 
@@ -3073,7 +3073,7 @@ return @ name; \
 { \
 return @ desc; \
 } \
--(void) INTERNAL_CATCH_UNIQUE_NAME( Catch_TestCase_test )
+-() INTERNAL_CATCH_UNIQUE_NAME( Catch_TestCase_test )
 
 #endif
 
