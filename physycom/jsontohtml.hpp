@@ -386,32 +386,32 @@ std::string json_to_html<json_t>::get_html()
     }
 
     output << R"(
-  }
+      }
 )";
 
     if (trip_style[i] != STYLE_REN && trip_style[i] != STYLE_PNG)
     {
       output << R"(
-  for (i = 0; i<Locations_trip_)" << i << R"(.length; i++) {
-    PolyPath_trip_)" << i << R"(.push(new google.maps.LatLng(Locations_trip_)" << i << R"([i][0], Locations_trip_)" << i << R"([i][1]))
-  }
-  Trajectory_trip_)" << i << R"( = new google.maps.Polyline({
-    path: PolyPath_trip_)" << i << R"(,
-    geodesic: true,
-    strokeColor: '#)" << colors_button[i] << R"(',
-    strokeOpacity: 1.,
-    strokeWeight: 2
-  });)";
-      output << R"(
-  Trajectory_trip_)" << i << R"(.setMap(map);
+      for (i = 0; i<Locations_trip_)" << i << R"(.length; i++) {
+        PolyPath_trip_)" << i << R"(.push(new google.maps.LatLng(Locations_trip_)" << i << R"([i][0], Locations_trip_)" << i << R"([i][1]))
+      }
 
+      Trajectory_trip_)" << i << R"( = new google.maps.Polyline({
+        path: PolyPath_trip_)" << i << R"(,
+        geodesic: true,
+        strokeColor: '#)" << colors_button[i] << R"(',
+        strokeOpacity: 1.,
+        strokeWeight: 2
+      });)";
+          output << R"(
+      Trajectory_trip_)" << i << R"(.setMap(map);
 )";
     }
   }
 
   output << R"(
-  map.fitBounds(bounds);
-  ruler_map = new RulerMap(map)
+    map.fitBounds(bounds);
+    ruler_map = new RulerMap(map)
 )";
 
   if (export_map)
@@ -420,8 +420,7 @@ std::string json_to_html<json_t>::get_html()
     google.maps.event.addListenerOnce(map, 'tilesloaded', function(){
       setTimeout(saveImage, 1000);
     });
-
-    )";
+)";
   }
 
   output << "\t\t}" << std::endl;
