@@ -3,6 +3,11 @@
 *.lo
 *.o
 *.obj
+*.suo
+*.u2d
+*.sdf
+*.user
+*.swp
 
 # Precompiled Headers
 *.gch
@@ -15,7 +20,6 @@
 
 # Fortran module files
 *.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
@@ -28,3 +32,8 @@
 *.out
 *.app
 .DS_Store
+
+[Bb]uild*/
+[Bb]in/
+.vs/
+.vscode/
