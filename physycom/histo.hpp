@@ -66,7 +66,7 @@ namespace physycom
       outhisto << std::endl;
       for (int i = 0; i < nbin; ++i)
       {
-        outhisto << i*binw << "\t";
+        outhisto << min + i*binw << "\t";
         for (const auto &label : counter) outhisto << counter[label.first][i] << "\t";
         outhisto << std::endl;
       }
@@ -77,7 +77,7 @@ namespace physycom
     {
       std::string basename = filename.substr(0, filename.find_last_of("."));
       std::ofstream outplt(filename);
-      outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,10" fontscale 0.8 size 960, 720 background rgb 'white'
+      outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
 set output ')" << basename << R"(.png'
 # Border xy
 set style line 101 lc rgb '#808080' lt 1 lw 1
@@ -103,7 +103,7 @@ set grid xtics ytics back ls 102
 set style fill solid 1.00 border lt - 1
 set style histogram clustered gap 1 title textcolor lt - 1
 set style data histograms
-set key top center
+set key top center autotitle columnhead
 set xrange[-1:)" << nbin << R"(]
 set yrange[0:*]
 set title 'Title'
