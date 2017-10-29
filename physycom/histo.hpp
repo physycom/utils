@@ -105,7 +105,7 @@ set style histogram clustered gap 1 title textcolor lt - 1
 set style data histograms
 set key top center autotitle columnhead
 set xrange[-1:)" << nbin << R"(]
-set yrange[0:*]
+set yrange[)" << min << ":" << max << R"(*]
 set title 'Title'
 set xlabel 'Xlabel'
 set ylabel 'Ylabel'
