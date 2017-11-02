@@ -19,6 +19,7 @@ namespace physycom
     std::map<std::string, std::vector<T>> data;
     std::map<std::string, std::vector<int>> counter;
     T min, max, binw;
+    int nmin = 100000, nmax = 0;
     int nbin;
 
     histo() {};
@@ -55,6 +56,12 @@ namespace physycom
           else
             counter[label.first][idx]++;
         }
+
+        for( auto c : counter[label.first] ) 
+        {
+          nmin = ( nmin < c ) ? nmin : c;
+          nmax = ( nmax > c ) ? nmax : c;
+        }
       }
     }
 
@@ -83,7 +90,7 @@ set output ')" << basename << R"(.png'
 set style line 101 lc rgb '#808080' lt 1 lw 1
 set border 3 front ls 101
 set tics nomirror out scale 0.75
-set format '%g'
+set format '%.0s %c'
 set border linewidth 1.5
 # Styles
 linew = 1.2
@@ -96,7 +103,7 @@ set style line 16 lc rgb '#4dbeee' linetype 2 linewidth linew # light - blue
 set style line 17 lc rgb '#a2142f' linetype 1 linewidth linew # red
 set style line 21 lc rgb '#a2142f' pointtype 7 linewidth 0.2 # red
 # Grid and Ticks
-set ytics 0, 1000, 10000 nomirror out scale 0.75
+set ytics 0, )" << int(1.2 * nmax/5) << ", " << 10*nmax << R"( nomirror out scale 0.75
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
 set grid xtics ytics back ls 102
 # More options
@@ -105,10 +112,10 @@ set style histogram clustered gap 1 title textcolor lt - 1
 set style data histograms
 set key top center autotitle columnhead
 set xrange[-1:)" << nbin << R"(]
-set yrange[)" << min << ":" << max << R"(*]
+set yrange[)" << nmin << ":" << 1.2 * nmax << R"(]
 set title 'Title'
 set xlabel 'Xlabel'
-set ylabel 'Ylabel'
+set ylabel 'Counter'
 set xtics border in scale 0, 0 nomirror rotate by - 45
 plot ')" << basename << R"(.txt')";
 
