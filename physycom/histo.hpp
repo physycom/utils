@@ -50,14 +50,11 @@ namespace physycom
         for (const auto &d : label.second)
         {
           int idx = int((d - min) / binw);
-          idx = (idx < nbin) ? idx : nbin - 1;
-          if (idx < 0) // to avoid segfault for inf and nan
-            counter[label.first][nbin-1]++;
-          else
-            counter[label.first][idx]++;
+          if( idx < 0 ) continue;
+          counter[label.first][(idx > nbin - 1) ? nbin - 1 : idx]++;
         }
 
-        for( auto c : counter[label.first] ) 
+        for(auto c : counter[label.first]) 
         {
           nmin = ( nmin < c ) ? nmin : c;
           nmax = ( nmax > c ) ? nmax : c;
