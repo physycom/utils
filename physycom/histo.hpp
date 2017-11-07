@@ -133,6 +133,7 @@ plot ')" << basename << R"(.txt')";
   {
     std::map<std::string, histo<T>> hs;
     void add_histo(std::string name, T min, T max, T binw) { hs[name] = histo<T>(min, max, binw); }
+    void add_histo(std::string name, T min, T max, int nbin) { hs[name] = histo<T>(min, max, nbin); }
     void push(std::string name, std::string tag, T t) { hs[name].data[tag].push_back(t); }
     void populate() { for(auto &h : hs) h.second.populate(); }
     void dump() { for(auto &h : hs) h.second.dump("histo_" + h.first + ".txt"); }
@@ -143,7 +144,7 @@ plot ')" << basename << R"(.txt')";
   struct covstats
   {
     multihisto<T> * mh;
-    std::map<std::string, std::map<std::string, std::map<std::string, double>>> normcov; // < tag, column, column, value>
+    std::map<std::string, std::map<std::string, std::map<std::string, double>>> cov;     // < tag, column, column, value>
     std::map<std::string, std::map<std::string, std::map<std::string, double>>> quad;    // < tag, column, column, value>
     std::map<std::string, std::map<std::string, double>> mean;                           // < tag, column, value>
     std::map<std::string, int> ndata;
@@ -155,28 +156,40 @@ plot ')" << basename << R"(.txt')";
 
     void populate()
     {
+      // sample numbers
+      for (auto x : mh->hs)
+      {
+        for (auto tag : x.second.data)
+        {
+          ndata[tag.first] = (int)tag.second.size();
+          cout << tag.first << " " << ndata[tag.first] << endl;
+        }
+        break;
+      }
+
       // mean
       for(auto &x : mh->hs)
         for(auto &tag : x.second.data)
-          for(int i = 0; i < tag.second.size(); ++i)
+          for (int i = 0; i < tag.second.size(); ++i)
             mean[tag.first][x.first] += x.second.data[tag.first][i];
-
-      for(auto x : mh->hs) for(auto tag : x.second.data) ndata[tag.first] = tag.second.size();
 
       // quad mean
       for(auto &x : mh->hs)
         for(auto &y : mh->hs)
           for(auto &tag : x.second.data)
-            for(int i = 0; i < tag.second.size(); ++i)
+            for (int i = 0; i < tag.second.size(); ++i)
+            {
               quad[tag.first][x.first][y.first] += x.second.data[tag.first][i] * y.second.data[tag.first][i];
+              //cov[tag.first][x.first][y.first] += (x.second.data[tag.first][i] - mean[tag.first][x.first] / ndata[tag.first]) * (y.second.data[tag.first][i] - mean[tag.first][y.first] / ndata[tag.first]) / ndata[tag.first];
+            }
 
-      for(auto tag : quad)
-        for(auto i : tag.second)
-          for(auto j : i.second)
-            normcov[tag.first][i.first][j.first] = 
-              ( quad[tag.first][i.first][j.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]) ) 
-              / sqrt( quad[tag.first][i.first][i.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][i.first] / double(ndata[tag.first] * ndata[tag.first]) )
-              / sqrt( quad[tag.first][j.first][j.first] / double(ndata[tag.first]) - mean[tag.first][j.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]) );
+
+      //// covariance
+      //for(auto tag : quad)
+      //  for(auto i : tag.second)
+      //    for(auto j : i.second)
+      //      cov[tag.first][i.first][j.first] = 
+      //        quad[tag.first][i.first][j.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]);
     }
   };
 
