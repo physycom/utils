@@ -7,6 +7,7 @@
 #ifndef PHYSYCOM_UTILS_HISTO_HPP
 #define PHYSYCOM_UTILS_HISTO_HPP
 
+#include <cmath>
 #include <vector>
 #include <map>
 #include <fstream>
@@ -136,6 +137,47 @@ plot ')" << basename << R"(.txt')";
     void populate() { for(auto &h : hs) h.second.populate(); }
     void dump() { for(auto &h : hs) h.second.dump("histo_" + h.first + ".txt"); }
     void gnuplot() { for(auto &h : hs) h.second.gnuplot("histo_" + h.first + ".plt"); }
+  };
+
+  template<typename T>
+  struct covstats
+  {
+    multihisto<T> * mh;
+    std::map<std::string, std::map<std::string, std::map<std::string, double>>> normcov; // < tag, column, column, value>
+    std::map<std::string, std::map<std::string, std::map<std::string, double>>> quad;    // < tag, column, column, value>
+    std::map<std::string, std::map<std::string, double>> mean;                           // < tag, column, value>
+    std::map<std::string, int> ndata;
+
+    covstats(multihisto<T> &mh_)
+    {
+      mh = &mh_;
+    }
+
+    void populate()
+    {
+      // mean
+      for(auto &x : mh->hs)
+        for(auto &tag : x.second.data)
+          for(int i = 0; i < tag.second.size(); ++i)
+            mean[tag.first][x.first] += x.second.data[tag.first][i];
+
+      for(auto x : mh->hs) for(auto tag : x.second.data) ndata[tag.first] = tag.second.size();
+
+      // quad mean
+      for(auto &x : mh->hs)
+        for(auto &y : mh->hs)
+          for(auto &tag : x.second.data)
+            for(int i = 0; i < tag.second.size(); ++i)
+              quad[tag.first][x.first][y.first] += x.second.data[tag.first][i] * y.second.data[tag.first][i];
+
+      for(auto tag : quad)
+        for(auto i : tag.second)
+          for(auto j : i.second)
+            normcov[tag.first][i.first][j.first] = 
+              ( quad[tag.first][i.first][j.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]) ) 
+              / sqrt( quad[tag.first][i.first][i.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][i.first] / double(ndata[tag.first] * ndata[tag.first]) )
+              / sqrt( quad[tag.first][j.first][j.first] / double(ndata[tag.first]) - mean[tag.first][j.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]) );
+    }
   };
 
 }   // end namespace physycom
