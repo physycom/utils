@@ -162,7 +162,7 @@ plot ')" << basename << R"(.txt')";
         for (auto tag : x.second.data)
         {
           ndata[tag.first] = (int)tag.second.size();
-          cout << tag.first << " " << ndata[tag.first] << endl;
+          std::cout << tag.first << " " << ndata[tag.first] << std::endl;
         }
         break;
       }
@@ -183,13 +183,14 @@ plot ')" << basename << R"(.txt')";
               //cov[tag.first][x.first][y.first] += (x.second.data[tag.first][i] - mean[tag.first][x.first] / ndata[tag.first]) * (y.second.data[tag.first][i] - mean[tag.first][y.first] / ndata[tag.first]) / ndata[tag.first];
             }
 
-
-      //// covariance
-      //for(auto tag : quad)
-      //  for(auto i : tag.second)
-      //    for(auto j : i.second)
-      //      cov[tag.first][i.first][j.first] = 
-      //        quad[tag.first][i.first][j.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]);
+      // covariance
+      for(auto tag : quad)
+        for(auto i : tag.second)
+          for(auto j : i.second)
+          {
+            std::cout << tag.first << " " << i.first << " " << j.first << std::endl;
+            cov[tag.first][i.first][j.first] = quad[tag.first][i.first][j.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]);
+          }
     }
   };
 
