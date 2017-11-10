@@ -147,7 +147,7 @@ plot ')" << basename << R"(.txt')";
     std::map<std::string, std::map<std::string, std::map<std::string, double>>> cov;     // < tag, column, column, value>
     std::map<std::string, std::map<std::string, std::map<std::string, double>>> quad;    // < tag, column, column, value>
     std::map<std::string, std::map<std::string, double>> mean;                           // < tag, column, value>
-    std::map<std::string, int> ndata;
+    std::map<std::string, int> ndata;                                                    // < tag, value >
 
     covstats(multihisto<T> &mh_)
     {
@@ -162,7 +162,6 @@ plot ')" << basename << R"(.txt')";
         for (auto tag : x.second.data)
         {
           ndata[tag.first] = (int)tag.second.size();
-          std::cout << tag.first << " " << ndata[tag.first] << std::endl;
         }
         break;
       }
