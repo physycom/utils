@@ -7,6 +7,7 @@
 #ifndef PHYSYCOM_UTILS_SPLIT_HPP
 #define PHYSYCOM_UTILS_SPLIT_HPP
 
+#include <string>
 #include <vector>
 
 namespace physycom{
@@ -45,16 +46,8 @@ namespace physycom{
 	}
 
 	template<typename T> T stoa(const std::string &s){}
-
-	template<> double stoa(const std::string &s)
-	{
-		return stod(s);
-	}
-	
-	template<> int stoa(const std::string &s)
-	{
-		return stoi(s);
-	}
+  template<> double stoa(const std::string &s) { return std::stod(s); }
+	template<> int stoa(const std::string &s) { return std::stoi(s); }
 
 	template<typename T> 
 	std::vector<T> stov(const std::string &s, const std::string &sep = ",")
