@@ -43,22 +43,24 @@ namespace physycom
       binw = (max - min) / nbin;
     }
 
+    void count(const std::string &tag, const T &t)
+    {
+      if( counter[tag].size() == 0 ) counter[tag].resize(nbin, 0);
+      int idx = int((t - min) / binw);
+      if( idx < 0 ) return;
+      counter[tag][(idx > nbin - 1) ? nbin - 1 : idx]++;
+    }
+
     void populate()
     {
-      for (auto label : data)
+      for (auto i : data)
       {
-        counter[label.first].resize(nbin, 0);
-        for (const auto &d : label.second)
+        counter[i.first].resize(nbin, 0);
+        for (const auto &d : i.second)
         {
           int idx = int((d - min) / binw);
           if( idx < 0 ) continue;
-          counter[label.first][(idx > nbin - 1) ? nbin - 1 : idx]++;
-        }
-
-        for(auto c : counter[label.first]) 
-        {
-          nmin = ( nmin < c ) ? nmin : c;
-          nmax = ( nmax > c ) ? nmax : c;
+          counter[i.first][(idx > nbin - 1) ? nbin - 1 : idx]++;
         }
       }
     }
@@ -72,7 +74,13 @@ namespace physycom
       for (int i = 0; i < nbin; ++i)
       {
         outhisto << min + i*binw << "\t";
-        for (const auto &label : counter) outhisto << counter[label.first][i] << "\t";
+        for (const auto &label : counter)
+        {
+          int cnt = counter[label.first][i];
+          nmin = ( nmin < cnt ) ? nmin : cnt;
+          nmax = ( nmax > cnt ) ? nmax : cnt;
+          outhisto << cnt << "\t";
+        }
         outhisto << std::endl;
       }
       outhisto.close();
@@ -128,12 +136,13 @@ plot ')" << basename << R"(.txt')";
 
   };
 
-  template<typename T> 
+  template<typename T>
   struct multihisto
   {
     std::map<std::string, histo<T>> hs;
     void add_histo(std::string name, T min, T max, T binw) { hs[name] = histo<T>(min, max, binw); }
     void add_histo(std::string name, T min, T max, int nbin) { hs[name] = histo<T>(min, max, nbin); }
+    void count(std::string name, std::string tag, T t) { hs[name].count(tag, t); }
     void push(std::string name, std::string tag, T t) { hs[name].data[tag].push_back(t); }
     void populate() { for(auto &h : hs) h.second.populate(); }
     void dump() { for(auto &h : hs) h.second.dump("histo_" + h.first + ".txt"); }
