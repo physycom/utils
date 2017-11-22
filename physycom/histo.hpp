@@ -82,7 +82,7 @@ namespace physycom
       {
         tot[p.first] = std::accumulate(p.second.begin(), p.second.end(), 0);
       });
-      
+
       std::ofstream outhisto(filename);
       outhisto << "  bin  ";
       for (const auto &label : counter) outhisto << label.first << "-cnt  " << label.first << "-cdf  ";
@@ -162,7 +162,8 @@ set output ')" << basename << R"(.cdf.png'
 set style line 101 lc rgb '#808080' lt 1 lw 1
 set border 11 front ls 101
 set tics nomirror out scale 0.75
-set format '%.0s %c'
+set format y '%.0s %c'
+set format y2 '%.0s %%'
 set border linewidth 1.5
 # Styles
 linew = 1.2
