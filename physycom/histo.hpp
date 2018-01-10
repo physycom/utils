@@ -154,7 +154,7 @@ plot ')" << basename << R"(.txt')";
 
     void gnuplot_cdf(const std::string &filename) const
     {
-      std::string basename = filename.substr(0, filename.find_first_of("."));
+      std::string basename = filename.substr(0, filename.find_last_of("."));
       std::ofstream outplt(filename);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
 set output ')" << basename << R"(.cdf.png'
