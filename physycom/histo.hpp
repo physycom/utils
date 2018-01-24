@@ -216,9 +216,9 @@ plot ')" << basename << R"(.txt')";
     void count(std::string name, std::string tag, T t) { hs[name].count(tag, t); }
     void push(std::string name, std::string tag, T t) { hs[name].data[tag].push_back(t); }
     void populate() { for(auto &h : hs) h.second.populate(); }
-    void dump() { for(auto &h : hs) h.second.dump("histo_" + h.first + ".txt"); }
-    void gnuplot() { for (auto &h : hs) h.second.gnuplot("histo_" + h.first + ".plt"); }
-    void gnuplot_cdf() { for(auto &h : hs) h.second.gnuplot_cdf("histo_" + h.first + ".cdf.plt"); }
+    void dump(std::string path_prefix = "") { for(auto &h : hs) h.second.dump(path_prefix + "histo_" + h.first + ".txt"); }
+    void gnuplot(std::string path_prefix = "") { for (auto &h : hs) h.second.gnuplot(path_prefix + "histo_" + h.first + ".plt"); }
+    void gnuplot_cdf(std::string path_prefix = "") { for(auto &h : hs) h.second.gnuplot_cdf(path_prefix + "histo_" + h.first + ".cdf.plt"); }
   };
 
   template<typename T>
