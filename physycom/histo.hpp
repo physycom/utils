@@ -106,26 +106,10 @@ namespace physycom
     void gnuplot(const std::string &filename) const
     {
       std::string basename = filename.substr(0, filename.find_last_of("."));
+      basename = basename.substr(filename.find_last_of("/\\")+1);
       std::ofstream outplt(filename);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
-set output ')" << basename << R"(.png'
-# Border xy
-set style line 101 lc rgb '#808080' lt 1 lw 1
-set border 3 front ls 101
-set tics nomirror out scale 0.75
-set format '%.0s %c'
-set border linewidth 1.5
-# Styles
-linew = 1.2
-set style line 11 lc rgb '#0072bd' linetype 1 linewidth linew # blue
-set style line 12 lc rgb '#d95319' linetype 1 linewidth linew # orange
-set style line 13 lc rgb '#edb120' linetype 1 linewidth linew # yellow
-set style line 14 lc rgb '#7e2f8e' linetype 1 linewidth linew # purple
-set style line 15 lc rgb '#77ac30' linetype 1 linewidth linew # green
-set style line 16 lc rgb '#4dbeee' linetype 2 linewidth linew # light - blue
-set style line 17 lc rgb '#a2142f' linetype 1 linewidth linew # red
-set style line 21 lc rgb '#a2142f' pointtype 7 linewidth 0.2 # red
-# Grid and Ticks
+set output ')" << basename << R"(.png')" << gnuplot_style << R"(# Grid and Ticks
 set ytics 0, )" << int(1.2 * nmax / 5) << ", " << 10 * nmax << R"( nomirror out scale 0.75
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
 set grid xtics ytics back ls 102
@@ -140,12 +124,13 @@ set title ')" << title << R"('
 set xlabel ')" << xlabel << R"('
 set ylabel ')" << ylabel << R"('
 set xtics border in scale 0, 0 nomirror rotate by - 45
+label_undersampling = 2
 plot ')" << basename << R"(.txt')";
 
       int cnt = 0, column = 2, style = 11;
       for (const auto &p : counter)
       {
-        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column << ":xtic(int($0) % 2 == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << style++ << ((cnt != counter.size() - 1) ? " ,\\" : "") << std::endl;
+        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << style++ << ((cnt != counter.size() - 1) ? " ,\\" : "") << std::endl;
         column += 2;
         ++cnt;
       }
@@ -155,28 +140,10 @@ plot ')" << basename << R"(.txt')";
     void gnuplot_cdf(const std::string &filename) const
     {
       std::string basename = filename.substr(0, filename.find_last_of("."));
-      std::ofstream outplt(filename);
+      std::ofstream outplt(basename + ".cdf.plt");
+      basename = basename.substr(filename.find_last_of("/\\") + 1);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
-set output ')" << basename << R"(.cdf.png'
-# Border
-set style line 101 lc rgb '#808080' lt 1 lw 1
-set border 11 front ls 101
-set tics nomirror out scale 0.75
-set format y '%.0s %c'
-set format y2 '%.0s %%'
-set border linewidth 1.5
-# Styles
-linew = 1.2
-ptsize = 1.5
-set style line 11 lc rgb '#0072bd' lt 1 lw linew # blue
-set style line 12 lc rgb '#d95319' lt 1 lw linew # orange
-set style line 13 lc rgb '#edb120' lt 1 lw linew # yellow
-set style line 14 lc rgb '#7e2f8e' lt 1 lw linew # purple
-set style line 15 lc rgb '#77ac30' lt 1 lw linew # green
-set style line 16 lc rgb '#4dbeee' lt 2 lw linew # light - blue
-set style line 17 lc rgb '#a2142f' lt 1 lw linew # red
-set style line 21 lc rgb '#d95319' pointtype 7 lw linew ps ptsize # orange
-# Grid and Ticks
+set output ')" << basename << R"(.cdf.png')" << gnuplot_style << R"(# Grid and Ticks
 set ytics 0, )" << int(1.2 * nmax/5) << ", " << 10*nmax << R"( nomirror out scale 0.75
 set y2tics 0, 10, 110 nomirror out scale 0.35
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
@@ -194,17 +161,43 @@ set xlabel ')" << xlabel << R"('
 set ylabel ')" << ylabel << R"('
 set y2label 'Percentage'
 set xtics border in scale 0, 0 nomirror rotate by - 45
+label_undersampling = 2
 plot ')" << basename << R"(.txt')";
 
       int cnt = 0, column = 2, hstyle = 11, lpstyle = 21;
       for (const auto &p : counter)
       {
-        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column++ << ":xtic(int($0) % 2 == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << hstyle++ << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
+        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column++ << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << hstyle++ << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
         outplt << ((cnt == 0) ? "" : "     ''") << " using (column(0)):($" << column++ << "*100) title '" << p.first << "-cdf' with linespoints ls " << lpstyle++ << " axes x1y2 " << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
       }
       outplt.close();
     }
 
+    string gnuplot_style = R"(# Border
+set style line 101 lc rgb '#808080' lt 1 lw 1
+set border 11 front ls 101
+set tics nomirror out scale 0.75
+set format y '%.0s %c'
+set format y2 '%.0s %%'
+set border linewidth 1.5
+# Styles
+linew = 1.2
+ptsize = 1.5
+set style line 11 lc rgb '#0072bd' lt 1 lw linew # blue
+set style line 12 lc rgb '#d95319' lt 1 lw linew # orange
+set style line 13 lc rgb '#edb120' lt 1 lw linew # yellow
+set style line 14 lc rgb '#7e2f8e' lt 1 lw linew # purple
+set style line 15 lc rgb '#77ac30' lt 1 lw linew # green
+set style line 16 lc rgb '#4dbeee' lt 2 lw linew # light - blue
+set style line 17 lc rgb '#a2142f' lt 1 lw linew # red
+set style line 21 lc rgb '#0072bd' pointtype 7 lw linew ps ptsize # blu
+set style line 22 lc rgb '#d95319' pointtype 7 lw linew ps ptsize # orange
+set style line 23 lc rgb '#edb120' pointtype 7 lw linew ps ptsize # yellow
+set style line 24 lc rgb '#7e2f8e' pointtype 7 lw linew ps ptsize # purple
+set style line 25 lc rgb '#77ac30' pointtype 7 lw linew ps ptsize # green
+set style line 26 lc rgb '#4dbeee' pointtype 7 lw linew ps ptsize # light - blue
+set style line 27 lc rgb '#a2142f' pointtype 7 lw linew ps ptsize # red
+)";
   };
 
   template<typename T>
@@ -218,7 +211,7 @@ plot ')" << basename << R"(.txt')";
     void populate() { for(auto &h : hs) h.second.populate(); }
     void dump(std::string path_prefix = "") { for(auto &h : hs) h.second.dump(path_prefix + "histo_" + h.first + ".txt"); }
     void gnuplot(std::string path_prefix = "") { for (auto &h : hs) h.second.gnuplot(path_prefix + "histo_" + h.first + ".plt"); }
-    void gnuplot_cdf(std::string path_prefix = "") { for(auto &h : hs) h.second.gnuplot_cdf(path_prefix + "histo_" + h.first + ".cdf.plt"); }
+    void gnuplot_cdf(std::string path_prefix = "") { for(auto &h : hs) h.second.gnuplot_cdf(path_prefix + "histo_" + h.first + ".plt"); }
   };
 
   template<typename T>
