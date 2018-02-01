@@ -173,7 +173,7 @@ plot ')" << basename << R"(.txt')";
       outplt.close();
     }
 
-    string gnuplot_style = R"(# Border
+    std::string gnuplot_style = R"(# Border
 set style line 101 lc rgb '#808080' lt 1 lw 1
 set border 11 front ls 101
 set tics nomirror out scale 0.75
