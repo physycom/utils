@@ -53,9 +53,9 @@ namespace physycom
 
     void count(const std::string &tag, const T &t)
     {
-      if( counter[tag].size() != nbin ) counter[tag].resize(nbin, 0);
+      if (counter[tag].size() != nbin) counter[tag].resize(nbin, 0);
       int idx = int((t - min) / binw);
-      if( idx < 0 ) return;
+      if (idx < 0) return;
       counter[tag][(idx > nbin - 1) ? nbin - 1 : idx]++;
     }
 
@@ -67,7 +67,7 @@ namespace physycom
         for (const auto &d : i.second)
         {
           int idx = int((d - min) / binw);
-          if( idx < 0 ) continue;
+          if (idx < 0) continue;
           counter[i.first][(idx > nbin - 1) ? nbin - 1 : idx]++;
         }
       }
@@ -89,14 +89,14 @@ namespace physycom
       outhisto << std::endl;
       for (int i = 0; i < nbin; ++i)
       {
-        outhisto << min + i*binw << "\t";
+        outhisto << min + i * binw << "\t";
         for (const auto &label : counter)
         {
           int cnt = counter[label.first][i];
-          nmin = ( nmin < cnt ) ? nmin : cnt;
-          nmax = ( nmax > cnt ) ? nmax : cnt;
+          nmin = (nmin < cnt) ? nmin : cnt;
+          nmax = (nmax > cnt) ? nmax : cnt;
 
-          outhisto << cnt << "\t" << (cumulate[label.first] += cnt / (double) tot[label.first]) << "\t";
+          outhisto << cnt << "\t" << (cumulate[label.first] += cnt / (double)tot[label.first]) << "\t";
         }
         outhisto << std::endl;
       }
@@ -106,11 +106,11 @@ namespace physycom
     void gnuplot(const std::string &filename) const
     {
       std::string basename = filename.substr(0, filename.find_last_of("."));
-      basename = basename.substr(filename.find_last_of("/\\")+1);
+      basename = basename.substr(filename.find_last_of("/\\") + 1);
       std::ofstream outplt(filename);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
 set output ')" << basename << R"(.png')" << gnuplot_style << R"(# Grid and Ticks
-set ytics 0, )" << int(1.2 * nmax / 5) << ", " << 10 * nmax << R"( nomirror out scale 0.75
+set ytics 0, )" << 1.2 * nmax / 5 << ", " << 10 * nmax << R"( nomirror out scale 0.75
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
 set grid xtics ytics back ls 102
 # More options
@@ -144,7 +144,7 @@ plot ')" << basename << R"(.txt')";
       basename = basename.substr(filename.find_last_of("/\\") + 1);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
 set output ')" << basename << R"(.cdf.png')" << gnuplot_style << R"(# Grid and Ticks
-set ytics 0, )" << int(1.2 * nmax/5) << ", " << 10*nmax << R"( nomirror out scale 0.75
+set ytics 0, )" << 1.2 * nmax / 5 << ", " << 10 * nmax << R"( nomirror out scale 0.75
 set y2tics 0, 10, 110 nomirror out scale 0.35
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
 set grid xtics ytics back ls 102
@@ -208,10 +208,10 @@ set style line 27 lc rgb '#a2142f' pointtype 7 lw linew ps ptsize # red
     void add_histo(std::string name, T min, T max, int nbin, std::string xl = "Xlabel", std::string yl = "Counter", std::string t = "Title") { hs[name] = histo<T>(min, max, nbin, xl, yl, t); }
     void count(std::string name, std::string tag, T t) { hs[name].count(tag, t); }
     void push(std::string name, std::string tag, T t) { hs[name].data[tag].push_back(t); }
-    void populate() { for(auto &h : hs) h.second.populate(); }
-    void dump(std::string path_prefix = "") { for(auto &h : hs) h.second.dump(path_prefix + "histo_" + h.first + ".txt"); }
+    void populate() { for (auto &h : hs) h.second.populate(); }
+    void dump(std::string path_prefix = "") { for (auto &h : hs) h.second.dump(path_prefix + "histo_" + h.first + ".txt"); }
     void gnuplot(std::string path_prefix = "") { for (auto &h : hs) h.second.gnuplot(path_prefix + "histo_" + h.first + ".plt"); }
-    void gnuplot_cdf(std::string path_prefix = "") { for(auto &h : hs) h.second.gnuplot_cdf(path_prefix + "histo_" + h.first + ".plt"); }
+    void gnuplot_cdf(std::string path_prefix = "") { for (auto &h : hs) h.second.gnuplot_cdf(path_prefix + "histo_" + h.first + ".plt"); }
   };
 
   template<typename T>
@@ -241,15 +241,15 @@ set style line 27 lc rgb '#a2142f' pointtype 7 lw linew ps ptsize # red
       }
 
       // mean
-      for(auto &x : mh->hs)
-        for(auto &tag : x.second.data)
+      for (auto &x : mh->hs)
+        for (auto &tag : x.second.data)
           for (int i = 0; i < tag.second.size(); ++i)
             mean[tag.first][x.first] += x.second.data[tag.first][i];
 
       // quad mean
-      for(auto &x : mh->hs)
-        for(auto &y : mh->hs)
-          for(auto &tag : x.second.data)
+      for (auto &x : mh->hs)
+        for (auto &y : mh->hs)
+          for (auto &tag : x.second.data)
             for (int i = 0; i < tag.second.size(); ++i)
             {
               quad[tag.first][x.first][y.first] += x.second.data[tag.first][i] * y.second.data[tag.first][i];
@@ -257,9 +257,9 @@ set style line 27 lc rgb '#a2142f' pointtype 7 lw linew ps ptsize # red
             }
 
       // covariance
-      for(auto tag : quad)
-        for(auto i : tag.second)
-          for(auto j : i.second)
+      for (auto tag : quad)
+        for (auto i : tag.second)
+          for (auto j : i.second)
           {
             std::cout << tag.first << " " << i.first << " " << j.first << std::endl;
             cov[tag.first][i.first][j.first] = quad[tag.first][i.first][j.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]);
