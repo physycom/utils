@@ -1,21 +1,7 @@
 /* Copyright 2015-2017 - Alessandro Fabbri, Stefano Sinigardi */
 
-/***************************************************************************
-This file is part of utils.
-
-utils is free software : you can redistribute it and / or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-utils is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with utils. If not, see <http://www.gnu.org/licenses/>.
-***************************************************************************/
+// Distributed under the Boost Software License, Version 1.0.
+// See accompanying file LICENSE or copy at http://www.boost.org/LICENSE_1_0.txt
 
 
 #ifndef UTILS_JSONTOHTML_HPP
@@ -222,18 +208,26 @@ std::string json_to_html<json_t>::get_html()
   <div id="map" style="width: )" << (export_map?"600px":"100%") << R"(; height: )" << (export_map ? "600px" : "100%") << R"(;"></div>
 
   <script type="text/javascript">
-  )";
+)";
+
   for (size_t i = 0; i < trips.size(); ++i)
   {
-    output << "\t\t\tvar Trajectory_trip_" << i << ";" << std::endl;
-    output << "\t\t\tvar Markers_trip_" << i << " = [];" << std::endl;
-    output << "\t\t\tvar PolyPath_trip_" << i << " = [];" << std::endl;
+    output << R"(
+    var Trajectory_trip_)" << i << ";" << R"(
+    var Markers_trip_)" << i << " = [];" << R"(
+    var PolyPath_trip_)" << i << " = [];" << R"(
+)";
+
   }
-  output << std::endl << "\t\t\tvar map;" << std::endl << std::endl;
-  output << "\t\t\tfunction initialize(){" << std::endl;
+  output << R"(
+    var map;
+    function initialize(){
+)";
+
   for (size_t i = 0; i < trips.size(); i++)
   {
-    output << std::endl << "\t\t\t\tvar Locations_trip_" << i << " = [" << std::endl;
+    output << R"(
+      var Locations_trip_)" << i << " = [" << std::endl;
     // start of gps points
     unsigned int last_timestamp = 0;
     for (size_t j = 0; j < trips[i].size(); j++)
@@ -300,110 +294,113 @@ std::string json_to_html<json_t>::get_html()
       << std::endl;
     }
     // end of gps points
-    output << "\t\t\t\t]" << std::endl;
+    output << "]" << std::endl;
   }
   output << R"(
-  map = new google.maps.Map(document.getElementById('map'), {
-    mapTypeId : google.maps.MapTypeId.ROADMAP,
-    disableDefaultUI: )" << std::boolalpha << export_map << std::dec << R"(
-  });
-
-  var infowindow = new google.maps.InfoWindow();
-  var Marker, i;
-  var bounds = new google.maps.LatLngBounds();
+      map = new google.maps.Map(document.getElementById('map'), {
+        mapTypeId : google.maps.MapTypeId.ROADMAP,
+        disableDefaultUI: )" << std::boolalpha << export_map << std::dec << R"(
+      });
+    
+      var infowindow = new google.maps.InfoWindow();
+      var Marker, i;
+      var bounds = new google.maps.LatLngBounds();
 )";
 
   for (size_t i = 0; i < trips.size(); i++)
   {
     output << "//////////////////////////////////////////////////////// TRIP " << i << std::endl;
     output << R"(
-  for (i = 0; i<Locations_trip_)" << i << R"(.length; i++)
-  {
-    var point = new google.maps.LatLng( Locations_trip_)" << i << "[i][0], Locations_trip_" << i << R"([i][1] )
-
-    bounds.extend(point);
-    )";
+      for (i = 0; i<Locations_trip_)" << i << R"(.length; i++)
+      {
+        var point = new google.maps.LatLng( Locations_trip_)" << i << "[i][0], Locations_trip_" << i << R"([i][1] )
+    
+        bounds.extend(point);
+)";
 
     if (trip_style[i] == STYLE_PNG || trip_style[i] == STYLE_POLYPNG)
     {
       output << R"(
-    var marker_url;
-    if ( Locations_trip_)" << i << R"([i][2].search("first_last") != -1 )
-      marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/blue.png';
-    else if ( Locations_trip_)" << i << R"([i][2].search("rdp_engine") != -1 )
-      marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/green.png';
-    else if ( Locations_trip_)" << i << R"([i][2].search("smart_restore") != -1 )
-      marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/yellow.png';
-    else if ( Locations_trip_)" << i << R"([i][2].search("ignition_on") != -1 )
-      marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/white.png';
-    else if ( Locations_trip_)" << i << R"([i][2].search("ignition_off") != -1 )
-      marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/black.png';
-    else
-      marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/green.png';
-
-    Marker = new google.maps.Marker({
-        position: point,
-        map: map,
-        zIndex: point[1],
-        icon: marker_url
-    });
-    Markers_trip_)" << i << R"(.push(Marker);
+        var marker_url;
+        if ( Locations_trip_)" << i << R"([i][2].search("first_last") != -1 )
+          marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/blue.png';
+        else if ( Locations_trip_)" << i << R"([i][2].search("rdp_engine") != -1 )
+          marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/green.png';
+        else if ( Locations_trip_)" << i << R"([i][2].search("smart_restore") != -1 )
+          marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/yellow.png';
+        else if ( Locations_trip_)" << i << R"([i][2].search("ignition_on") != -1 )
+          marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/white.png';
+        else if ( Locations_trip_)" << i << R"([i][2].search("ignition_off") != -1 )
+          marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/black.png';
+        else
+          marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/green.png';
+    
+        Marker = new google.maps.Marker({
+            position: point,
+            map: map,
+            zIndex: point[1],
+            icon: marker_url
+        });
+        Markers_trip_)" << i << R"(.push(Marker);
 )";
     }
 
     if (trip_style[i] == STYLE_REN || trip_style[i] == STYLE_POLYREN)
     {
       output << R"(
-    Marker = new google.maps.Marker({
-      position: point,
-      map : map,
-      icon : {
-        path: google.maps.SymbolPath.CIRCLE,
-        strokeColor : '#)" << colors_button[i] << R"(',
-        scale : 3
-      }
-    });
-    Markers_trip_)" << i << R"(.push(Marker);
+        Marker = new google.maps.Marker({
+          position: point,
+          map : map,
+          icon : {
+            path: google.maps.SymbolPath.CIRCLE,
+            strokeColor : '#)" << colors_button[i] << R"(',
+            scale : 3
+          }
+        });
+        Markers_trip_)" << i << R"(.push(Marker);
 )";
     }
 
     if (trip_style[i] != STYLE_POLY)
     {
       output << R"(
-    google.maps.event.addListener(Marker, 'click', (function(marker, i) {
-      return function() {
-        infowindow.setContent(Locations_trip_)" << i << R"([i][2]);
-        infowindow.open(map, marker);
-      }
-    })(Marker, i));
+        google.maps.event.addListener(Marker, 'click', (function(marker, i) {
+          return function() {
+            infowindow.setContent(Locations_trip_)" << i << R"([i][2]);
+            infowindow.open(map, marker);
+          }
+        })(Marker, i));
 )";
     }
 
     output << R"(
-  }
+      }
 )";
 
     if (trip_style[i] != STYLE_REN && trip_style[i] != STYLE_PNG)
     {
       output << R"(
-  for (i = 0; i<Locations_trip_)" << i << R"(.length; i++) {
-    PolyPath_trip_)" << i << R"(.push(new google.maps.LatLng(Locations_trip_)" << i << R"([i][0], Locations_trip_)" << i << R"([i][1]))
-  }
-  Trajectory_trip_)" << i << R"( = new google.maps.Polyline({
-    path: PolyPath_trip_)" << i << R"(,
-    geodesic: true,
-    strokeColor: '#)" << colors_button[i] << R"(',
-    strokeOpacity: 1.,
-    strokeWeight: 2
-  });)";
-      output << R"(
-  Trajectory_trip_)" << i << R"(.setMap(map);
+      for (i = 0; i<Locations_trip_)" << i << R"(.length; i++) {
+        PolyPath_trip_)" << i << R"(.push(new google.maps.LatLng(Locations_trip_)" << i << R"([i][0], Locations_trip_)" << i << R"([i][1]))
+      }
 
+      Trajectory_trip_)" << i << R"( = new google.maps.Polyline({
+        path: PolyPath_trip_)" << i << R"(,
+        geodesic: true,
+        strokeColor: '#)" << colors_button[i] << R"(',
+        strokeOpacity: 1.,
+        strokeWeight: 2
+      });)";
+          output << R"(
+      Trajectory_trip_)" << i << R"(.setMap(map);
 )";
     }
   }
-  output << std::endl << "\t\t\t\tmap.fitBounds(bounds);" << std::endl;
-  output << "\t\t\t\truler_map = new RulerMap(map)" << std::endl;
+
+  output << R"(
+    map.fitBounds(bounds);
+    ruler_map = new RulerMap(map)
+)";
 
   if (export_map)
   {
@@ -411,8 +408,7 @@ std::string json_to_html<json_t>::get_html()
     google.maps.event.addListenerOnce(map, 'tilesloaded', function(){
       setTimeout(saveImage, 1000);
     });
-
-    )";
+)";
   }
 
   output << "\t\t}" << std::endl;
@@ -447,24 +443,30 @@ std::string json_to_html<json_t>::get_html()
         }
       });
     }
-    )";
+)";
   }
 
   output << R"(
-  google.maps.event.addDomListener(window, 'load', initialize);
+    google.maps.event.addDomListener(window, 'load', initialize);
+  
+    </script>
+    <div id = "panel">
+)";
 
-  </script>
-  <div id = "panel">
-  )";
   for (size_t i = 0; i < trips.size(); ++i)
   {
-    output << "\t\t\t<button onclick = \"toggle_trip_" << i
-           << "()\" style = \"background-color:#" << colors_button[i] << "; color:#" << colors_text[i] << "\">" << trip_tag[i] << "</button>" << std::endl;
+    output << R"(
+    <button onclick = "toggle_trip_)" << i
+           << "()\" style = \"background-color:#" << colors_button[i] 
+           << "; color:#" << colors_text[i] << "\">" 
+           << trip_tag[i] << "</button>" << std::endl;
   }
-  output << R"(    </div>
-  </body>
-  </html>
-  )";
+
+  output << R"(
+  </div>
+</body>
+</html>
+)";
 
   return output.str();
 }

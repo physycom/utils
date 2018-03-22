@@ -1,21 +1,7 @@
 /* Copyright 2017 - Alessandro Fabbri */
 
-/***************************************************************************
-This file is part of utils.
-
-utils is free software : you can redistribute it and / or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-utils is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with utils. If not, see <http://www.gnu.org/licenses/>.
-***************************************************************************/
+// Distributed under the Boost Software License, Version 1.0.
+// See accompanying file LICENSE or copy at http://www.boost.org/LICENSE_1_0.txt
 
 
 #ifndef PHYSYCOM_UTILS_JSER_HPP
@@ -32,7 +18,7 @@ along with utils. If not, see <http://www.gnu.org/licenses/>.
 namespace physycom
 {
 	// (De)Serialize JSON into class
-	template<typename json_t, class T>
+	template<class T, typename json_t>
 	std::vector<T> deserialize(const json_t j)
 	{
 	  std::vector<T> trip(0);
@@ -53,7 +39,7 @@ namespace physycom
 	  json_t r;
 	  if ( mode == 'a')      // array
 	  {
-	    j = json_t::array();
+	    j = typename json_t::array();
 	    for(const auto &r : vec)
 	      j.add(r.to_json());
 	  }
