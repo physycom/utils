@@ -154,6 +154,8 @@ template<typename Func>
 void json_to_html<json_t>::push(std::string raw_json, Func f)
 {
   digest(raw_json);
+  // by making a tuple out of f...
+  // the function passed becomes callable
   idx_new_trip = (int)trips.size();
   f();
   records.clear();

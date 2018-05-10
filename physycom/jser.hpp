@@ -18,7 +18,7 @@
 namespace physycom
 {
 	// (De)Serialize JSON into class
-	template<typename json_t, class T>
+	template<class T, typename json_t>
 	std::vector<T> deserialize(const json_t j)
 	{
 	  std::vector<T> trip(0);
