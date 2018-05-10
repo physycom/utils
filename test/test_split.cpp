@@ -7,9 +7,9 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
-#include <boost/algorithm/string.hpp> 
+#include <boost/algorithm/string.hpp>
 #include <chrono>
-#include "physycom/split.hpp"
+#include "physycom/string.hpp"
 
 using namespace std;
 using namespace physycom;
@@ -38,7 +38,7 @@ TEST_CASE( "Timing " ) {
 	string line;
 	string separators;
 	std::vector<std::string> tokens, result;
-	
+
     boost_splitting_time = 0;
     physycom_splitting_time = 0;
     line = "string\tto\tsplit\tbecause\twe\twant\tto";
@@ -119,7 +119,7 @@ TEST_CASE( "Correctness " ) {
 
 		REQUIRE( tokens.size() == result.size() );
 		for(size_t i=0; i<tokens.size(); i++){
-			REQUIRE( tokens[i] == result[i] );		
+			REQUIRE( tokens[i] == result[i] );
 		}
 	}
 	line = "__string_to__split__";
@@ -130,7 +130,7 @@ TEST_CASE( "Correctness " ) {
 
 		REQUIRE( tokens.size() == result.size() );
 		for(size_t i=0; i<tokens.size(); i++){
-			REQUIRE( tokens[i] == result[i] );		
+			REQUIRE( tokens[i] == result[i] );
 		}
     }
 	line = "string_to_split";
@@ -141,7 +141,7 @@ TEST_CASE( "Correctness " ) {
 
 		REQUIRE( tokens.size() == result.size() );
 		for(size_t i=0; i<tokens.size(); i++){
-			REQUIRE( tokens[i] == result[i] );		
+			REQUIRE( tokens[i] == result[i] );
 		}
 	}
 	line = "__string_to__split__";
@@ -152,7 +152,7 @@ TEST_CASE( "Correctness " ) {
 
 		REQUIRE( tokens.size() == result.size() );
 		for(size_t i=0; i<tokens.size(); i++){
-			REQUIRE( tokens[i] == result[i] );		
+			REQUIRE( tokens[i] == result[i] );
 		}
 	}
 }
