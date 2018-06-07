@@ -9,11 +9,9 @@
 namespace physycom
 {
 
-  class combinations
+  struct
   {
-  public:
-    combinations() {};
-    ~combinations() {};
+    std::vector<unsigned long> pos;
 
     template<typename T>
     std::vector<T> operator()(const T &elems, unsigned long k)
@@ -25,9 +23,6 @@ namespace physycom
       return tuple;
     }
 
-  private:
-    std::vector<unsigned long> pos;
-
     template<typename T>
     void combinations_recursive(const T &elems, unsigned long k, unsigned long depth, unsigned long margin, std::vector<T> &tuple)
     {
@@ -38,6 +33,7 @@ namespace physycom
         return;
       }
 
+      // magic condition which prevents from useless recursion
       if ((elems.size() - margin) < (k - depth))
         return;
 
@@ -49,7 +45,7 @@ namespace physycom
 
       return;
     }
-  };
+  } combinations;
 
 } // end of namespace physycom
 

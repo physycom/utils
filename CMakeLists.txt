@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-project (utils)
+project(utils)
 
 if (EXISTS "$ENV{WORKSPACE}/sysconfig/cmake/physycom_config.cmake")
    message(STATUS "Enabling physycom settings")
