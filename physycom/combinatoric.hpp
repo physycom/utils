@@ -11,6 +11,23 @@ namespace physycom
 
   struct
   {
+    template<typename T>
+    std::vector<T> operator()(T elem)
+    {
+      std::vector<T> tuple;
+      std::sort(elem.begin(), elem.end());
+      do
+      {
+        tuple.push_back(elem);
+      }
+      while( std::next_permutation(elem.begin(),elem.end()) );
+      return tuple;
+    }
+
+  } permutations;
+
+  struct
+  {
     std::vector<unsigned long> pos;
 
     template<typename T>
