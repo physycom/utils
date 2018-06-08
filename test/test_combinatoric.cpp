@@ -1,3 +1,4 @@
+#include <cmath>
 #include <physycom/combinatoric.hpp>
 
 using namespace std;
@@ -34,6 +35,13 @@ int main()
   auto comb_s = combinations(s, 3);
   for(int i = 0; i < comb_s.size(); ++i)
     cout << i+1 << ") " << comb_s[i] << endl;
+
+  // OPERATIONS
+  int n=5, k=3;
+  cout << n << "! = " << factorial(n) << endl;
+  cout << "( " << n << " " << k << " ) = " << binom(n,k) << endl;
+  int check = 0; for(int i = 0; i <= n; ++i) check += binom(n,i);
+  cout << "Consistency : " << ( (check == pow(2,n)) ? "OK" : "fail" ) << endl;
 
   return 0;
 }
