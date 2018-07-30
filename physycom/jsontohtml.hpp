@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <sstream>
 #include <type_traits>
-#include <physycom/split.hpp>
+#include <physycom/string.hpp>
 
 const std::string html_header =
 R"(
