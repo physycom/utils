@@ -150,7 +150,7 @@ void json_to_html<json_t>::digest(std::string raw_json)
 // variadic push raw json string to trips
 // accepts a lambda for splitting function
 template<typename json_t>
-template<typename Func> 
+template<typename Func>
 void json_to_html<json_t>::push(std::string raw_json, Func f)
 {
   digest(raw_json);
@@ -161,27 +161,27 @@ void json_to_html<json_t>::push(std::string raw_json, Func f)
   records.clear();
 }
 
-// utility wrapper for files 
+// utility wrapper for files
 template<typename json_t>
-template<typename Func> 
+template<typename Func>
 void json_to_html<json_t>::push_file(std::string filename, Func f)
 {
   jsoncons::json _records = jsoncons::json::parse_file(filename);
   push(_records.to_string(), f);
 }
 
-// utility wrapper for files 
+// utility wrapper for files
 template<typename json_t>
 void json_to_html<json_t>::init_specs(std::string tag, json_t jspec)
 {
-  for (int i = idx_new_trip; i < (int)trips.size(); ++i) 
+  for (int i = idx_new_trip; i < (int)trips.size(); ++i)
   {
     if(jspec.has_member("color")) colors_button.push_back(jspec["color"].as_string());
     else colors_button.push_back("FF0000");
 
     colors_text.push_back("000000");
 
-    if(jspec.has_member("style")) 
+    if(jspec.has_member("style"))
     {
       auto style = jspec["style"].as_string();
       if( physycom::belongs_to(style,allowed_styles) ) trip_style.push_back(style);
@@ -243,7 +243,7 @@ std::string json_to_html<json_t>::get_html()
           tooltip += "<br />altitude: " + trips[i][j].at("alt").template as<std::string>();
         if (trips[i][j].has_member("delta_dist"))
           tooltip += "<br />ds (m): " + trips[i][j].at("delta_dist").template as<std::string>();
-        if (trips[i][j].has_member("timestamp")) 
+        if (trips[i][j].has_member("timestamp"))
         {
           try
           {
@@ -270,7 +270,7 @@ std::string json_to_html<json_t>::get_html()
           tooltip += "<br />speed: " + trips[i][j].at("speed").template as<std::string>();
         if (trips[i][j].has_member("enabling"))
           tooltip += "<br />cause: " + trips[i][j].at("enabling").template as<std::string>();
-        if (trips[i][j].has_member("tracking_glonass")) 
+        if (trips[i][j].has_member("tracking_glonass"))
         {
           tooltip += "<br />glonass sats (used/seen): " + trips[i][j].at("using_glonass").template as<std::string>() + " / " + trips[i][j].at("tracking_glonass").template as<std::string>();
           tooltip += "<br />gps sats (used/seen): " + trips[i][j].at("using_gps").template as<std::string>() + " / " + trips[i][j].at("tracking_gps").template as<std::string>();
@@ -280,6 +280,8 @@ std::string json_to_html<json_t>::get_html()
           tooltip += "<br />fix: " + trips[i][j].at("fix").template as<std::string>();
         if (trips[i][j].has_member("global_index"))
           tooltip += "<br />global index: " + trips[i][j].at("global_index").template as<std::string>();
+        if (trips[i][j].has_member("tooltip"))
+          tooltip += "<br />" + trips[i][j].at("tooltip").template as<std::string>();
       }
       output
       << "["
@@ -301,7 +303,7 @@ std::string json_to_html<json_t>::get_html()
         mapTypeId : google.maps.MapTypeId.ROADMAP,
         disableDefaultUI: )" << std::boolalpha << export_map << std::dec << R"(
       });
-    
+
       var infowindow = new google.maps.InfoWindow();
       var Marker, i;
       var bounds = new google.maps.LatLngBounds();
@@ -314,7 +316,7 @@ std::string json_to_html<json_t>::get_html()
       for (i = 0; i<Locations_trip_)" << i << R"(.length; i++)
       {
         var point = new google.maps.LatLng( Locations_trip_)" << i << "[i][0], Locations_trip_" << i << R"([i][1] )
-    
+
         bounds.extend(point);
 )";
 
@@ -334,7 +336,7 @@ std::string json_to_html<json_t>::get_html()
           marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/black.png';
         else
           marker_url = 'http://maps.gpsvisualizer.com/google_maps/icons/circle/green.png';
-    
+
         Marker = new google.maps.Marker({
             position: point,
             map: map,
@@ -448,7 +450,7 @@ std::string json_to_html<json_t>::get_html()
 
   output << R"(
     google.maps.event.addDomListener(window, 'load', initialize);
-  
+
     </script>
     <div id = "panel">
 )";
@@ -457,8 +459,8 @@ std::string json_to_html<json_t>::get_html()
   {
     output << R"(
     <button onclick = "toggle_trip_)" << i
-           << "()\" style = \"background-color:#" << colors_button[i] 
-           << "; color:#" << colors_text[i] << "\">" 
+           << "()\" style = \"background-color:#" << colors_button[i]
+           << "; color:#" << colors_text[i] << "\">"
            << trip_tag[i] << "</button>" << std::endl;
   }
 
