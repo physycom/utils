@@ -13,18 +13,9 @@ addons:
     packages:
     - libboost-all-dev
 
-matrix:
-    exclude:
-    - os: osx
-      compiler: gcc
-    - os: linux
-      compiler: clang
-
 install:
   - git clone https://github.com/physycom/sysconfig.git
   - export WORKSPACE=$(pwd)
-  - mkdir build && cd build
 
 script:
-  - cmake ..
-  - cmake --build .
+  - mkdir build && cd build && cmake .. && cmake --build .
