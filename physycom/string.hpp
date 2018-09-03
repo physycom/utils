@@ -8,6 +8,7 @@
 #define PHYSYCOM_UTILS_SPLIT_HPP
 
 #include <vector>
+#include <cctype>
 
 namespace physycom{
 
