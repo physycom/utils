@@ -23,7 +23,8 @@ namespace physycom{
     return false;
   }
 
-  void split(std::vector<std::string>& tok, const std::string& str, const std::string& sep, const int& mode = token_compress_off){
+  template<typename T>
+  void split(std::vector<T>& tok, const T &str, const T &sep, const int &mode = token_compress_off){
     tok.clear();
     if( str.size() ){
       auto start = str.begin();
@@ -45,6 +46,7 @@ namespace physycom{
     }
   }
 
+/*
   template<typename T> T stoa(const std::string &s){}
 
   template<> double stoa(const std::string &s)
@@ -65,6 +67,7 @@ namespace physycom{
     physycom::split(tok, s, sep, physycom::token_compress_on);
     for(const auto &t : tok) v.push_back(stoa<T>(t));
   }
+*/
 
   static inline void trim_inplace(std::string &s)
   {
