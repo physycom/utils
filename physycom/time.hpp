@@ -15,9 +15,9 @@
 #include <physycom/string.hpp>
 
 // Convert date/time to unix time
-size_t date_to_unix(const std::string &date) {
+inline size_t date_to_unix(const std::string &date) {
   std::vector<std::string> date_v;
-  physycom::split(date_v, date, "- :", physycom::token_compress_off);
+  physycom::split(date_v, date, std::string("- :"), physycom::token_compress_off);
   size_t timestamp;
   try {
     struct tm time_now;
@@ -37,7 +37,7 @@ size_t date_to_unix(const std::string &date) {
 }
 
 // Convert unix time to date/time
-std::string unix_to_date(const size_t &t_unix)
+inline std::string unix_to_date(const size_t &t_unix)
 {
   struct tm * t;
   t = std::localtime((time_t *)&t_unix);
@@ -51,18 +51,18 @@ std::string unix_to_date(const size_t &t_unix)
 
 // Assign time slot
 // 1) Auto mode, based on minutes
-std::string find_slot_auto_ranges_minutes(const std::string &date, const std::string &time_min = "00:15",const std::string &time_max = "23:59", int dtmin = 30) {     // 3/10/2016 12:14:34
+inline std::string find_slot_auto_ranges_minutes(const std::string &date, const std::string &time_min = "00:15",const std::string &time_max = "23:59", int dtmin = 30) {     // 3/10/2016 12:14:34
   // extract date components and convert hour to minutes since 00:00:00
   std::vector<std::string> tok;
-  physycom::split(tok, date, "- :", physycom::token_compress_off);
+  physycom::split(tok, date, std::string("- :"), physycom::token_compress_off);
   std::stringstream slot;
   slot << tok[0] << tok[1] << tok[2] << "_";
   size_t tmin_now = stoi(tok[3])*60+stoi(tok[4]);
 
   // convert time_min and time_max to minutes since 00:00:00
-  physycom::split(tok, time_min, ":", physycom::token_compress_off);
+  physycom::split(tok, time_min, std::string(":"), physycom::token_compress_off);
   size_t tmin_min = stoi(tok[0])*60 + stoi(tok[1]);
-  physycom::split(tok, time_max, ":", physycom::token_compress_off);
+  physycom::split(tok, time_max, std::string(":"), physycom::token_compress_off);
   size_t tmin_max = stoi(tok[0])*60 + stoi(tok[1]);
 
   // prepare the output string
@@ -95,10 +95,10 @@ std::string find_slot_auto_ranges_minutes(const std::string &date, const std::st
 }
 
 // 2) Manual mode
-std::string find_slot_manual_ranges(const std::string &date) {
+inline std::string find_slot_manual_ranges(const std::string &date) {
   std::string slot;
   std::vector<std::string> date_v;
-  physycom::split(date_v, date, "- :", physycom::token_compress_off);
+  physycom::split(date_v, date, std::string("- :"), physycom::token_compress_off);
   slot = date_v[0] + date_v[1] + date_v[2] + "_";
   int h = stoi(date_v[3]);
   if (h < 8 || h >= 23) {
@@ -124,10 +124,10 @@ std::string find_slot_manual_ranges(const std::string &date) {
 }
 
 // 3) Mini manual mode
-std::string find_slot_mini_ranges(const std::string &date) {
+inline std::string find_slot_mini_ranges(const std::string &date) {
   std::string slot;
   std::vector<std::string> date_v;
-  physycom::split(date_v, date, "- :", physycom::token_compress_off);
+  physycom::split(date_v, date, std::string("- :"), physycom::token_compress_off);
   int h = stoi(date_v[3]);
   if (h >= 7 && h < 12) {
     slot = "07-12";
@@ -147,12 +147,12 @@ std::string find_slot_mini_ranges(const std::string &date) {
 
 // Returns a vector of string with the given ranges
 // E.G. "10.00-10.30" "10.30-11.00" ...
-std::vector<std::string> get_slot_auto_ranges_minutes(const std::string &time_min = "00:15", const std::string &time_max = "23:59", int dtmin = 30)
+inline std::vector<std::string> get_slot_auto_ranges_minutes(const std::string &time_min = "00:15", const std::string &time_max = "23:59", int dtmin = 30)
 {
   std::vector<std::string> tok;
-  physycom::split(tok, time_min, ":", physycom::token_compress_off);
+  physycom::split(tok, time_min, std::string(":"), physycom::token_compress_off);
   int tmin_min = stoi(tok[0]) * 60 + stoi(tok[1]);
-  physycom::split(tok, time_max, ":", physycom::token_compress_off);
+  physycom::split(tok, time_max, std::string(":"), physycom::token_compress_off);
   int tmin_max = stoi(tok[0]) * 60 + stoi(tok[1]);
 
   // prepare the output string

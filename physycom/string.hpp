@@ -23,7 +23,8 @@ namespace physycom{
     return false;
   }
 
-  void split(std::vector<std::string>& tok, const std::string& str, const std::string& sep, const int& mode = token_compress_off){
+  template<typename T>
+  void split(std::vector<T>& tok, const T &str, const T &sep, const int &mode = token_compress_off){
     tok.clear();
     if( str.size() ){
       auto start = str.begin();
@@ -45,20 +46,20 @@ namespace physycom{
     }
   }
 
-  template<typename T> T stoa(const std::string &s){}
+  template<typename T> inline T stoa(const std::string &s){}
 
-  template<> double stoa(const std::string &s)
+  template<> inline double stoa(const std::string &s)
   {
     return stod(s);
   }
 
-  template<> int stoa(const std::string &s)
+  template<> inline int stoa(const std::string &s)
   {
     return stoi(s);
   }
 
   template<typename T>
-  std::vector<T> stov(const std::string &s, const std::string &sep = ",")
+  inline std::vector<T> stov(const std::string &s, const std::string &sep = ",")
   {
     std::vector<T> v;
     std::vector<std::string> tok;
