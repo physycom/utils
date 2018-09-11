@@ -12,7 +12,7 @@
 #include <string>
 #include <ctime>
 
-#include <physycom/split.hpp>
+#include <physycom/string.hpp>
 
 // Convert date/time to unix time
 size_t date_to_unix(const std::string &date) {
