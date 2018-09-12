@@ -47,7 +47,7 @@ TEST_CASE( "Timing " ) {
     SECTION( "Simple case, compress on, single separator\nstring = " + line + "\nseparators = " + separators ) {
         for (size_t i=0; i<num_passes; i++) {
             boost_splitting_time += time_us::exec(boost::split<std::vector<std::string>, std::string, decltype(boost::is_any_of(separators))>, tokens, line, boost::is_any_of(separators), boost::token_compress_on);
-            physycom_splitting_time += time_us::exec(split, tokens, line, separators, token_compress_on);
+            physycom_splitting_time += time_us::exec(split<std::string>, tokens, line, separators, token_compress_on);
         }
 		REQUIRE( physycom_splitting_time <= boost_splitting_time );
     }
@@ -60,7 +60,7 @@ TEST_CASE( "Timing " ) {
     SECTION( "Simple case, compress off, single separator\nstring = " + line + "\nseparators = " + separators ) {
         for (size_t i=0; i<num_passes; i++) {
             boost_splitting_time += time_us::exec(boost::split<std::vector<std::string>, std::string, decltype(boost::is_any_of(separators))>, tokens, line, boost::is_any_of(separators), boost::token_compress_off);
-            physycom_splitting_time += time_us::exec(split, tokens, line, separators, token_compress_off);
+            physycom_splitting_time += time_us::exec(split<std::string>, tokens, line, separators, token_compress_off);
         }
 		REQUIRE( physycom_splitting_time <= boost_splitting_time );
     }
@@ -73,7 +73,7 @@ TEST_CASE( "Timing " ) {
     SECTION( "Simple case, compress on, single separator\nstring = " + line + "\nseparators = " + separators ) {
         for (size_t i=0; i<num_passes; i++) {
             boost_splitting_time += time_us::exec(boost::split<std::vector<std::string>, std::string, decltype(boost::is_any_of(separators))>, tokens, line, boost::is_any_of(separators), boost::token_compress_on);
-            physycom_splitting_time += time_us::exec(split, tokens, line, separators, token_compress_on);
+            physycom_splitting_time += time_us::exec(split<std::string>, tokens, line, separators, token_compress_on);
         }
 		REQUIRE( physycom_splitting_time <= boost_splitting_time );
     }
@@ -86,7 +86,7 @@ TEST_CASE( "Timing " ) {
     SECTION( "Simple case, compress off, single separator\nstring = " + line + "\nseparators = " + separators ) {
         for (size_t i=0; i<num_passes; i++) {
             boost_splitting_time += time_us::exec(boost::split<std::vector<std::string>, std::string, decltype(boost::is_any_of(separators))>, tokens, line, boost::is_any_of(separators), boost::token_compress_off);
-            physycom_splitting_time += time_us::exec(split, tokens, line, separators, token_compress_off);
+            physycom_splitting_time += time_us::exec(split<std::string>, tokens, line, separators, token_compress_off);
         }
 		REQUIRE( physycom_splitting_time <= boost_splitting_time );
     }
@@ -99,7 +99,7 @@ TEST_CASE( "Timing " ) {
     SECTION( "Simple case, compress on, single separator\nstring = " + line + "\nseparators = " + separators ) {
         for (size_t i=0; i<num_passes; i++) {
             boost_splitting_time += time_us::exec(boost::split<std::vector<std::string>, std::string, decltype(boost::is_any_of(separators))>, tokens, line, boost::is_any_of(separators), boost::token_compress_on);
-            physycom_splitting_time += time_us::exec(split, tokens, line, separators, token_compress_on);
+            physycom_splitting_time += time_us::exec(split<std::string>, tokens, line, separators, token_compress_on);
         }
 		REQUIRE( physycom_splitting_time <= boost_splitting_time );
     }
