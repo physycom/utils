@@ -12,6 +12,7 @@
 #include <map>
 #include <fstream>
 #include <numeric>
+#include <algorithm>
 
 namespace physycom
 {
