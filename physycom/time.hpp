@@ -43,7 +43,7 @@ inline std::string unix_to_date(const size_t &t_unix)
   t = std::localtime((time_t *)&t_unix);
 
   char tcs[100];
-  std::strftime(tcs, sizeof(tcs), "%H:%M %d/%m/%Y", t);
+  std::strftime(tcs, sizeof(tcs), "%Y-%m-%d %H:%M:%S", t);
 
   return std::string(tcs);
 }
