@@ -53,9 +53,9 @@ namespace physycom
 
     void count(const std::string &tag, const T &t)
     {
-      if( counter[tag].size() != nbin ) counter[tag].resize(nbin, 0);
+      if (counter[tag].size() != nbin) counter[tag].resize(nbin, 0);
       int idx = int((t - min) / binw);
-      if( idx < 0 ) return;
+      if (idx < 0) return;
       counter[tag][(idx > nbin - 1) ? nbin - 1 : idx]++;
     }
 
@@ -67,7 +67,7 @@ namespace physycom
         for (const auto &d : i.second)
         {
           int idx = int((d - min) / binw);
-          if( idx < 0 ) continue;
+          if (idx < 0) continue;
           counter[i.first][(idx > nbin - 1) ? nbin - 1 : idx]++;
         }
       }
@@ -89,14 +89,14 @@ namespace physycom
       outhisto << std::endl;
       for (int i = 0; i < nbin; ++i)
       {
-        outhisto << min + i*binw << "\t";
+        outhisto << min + i * binw << "\t";
         for (const auto &label : counter)
         {
           int cnt = counter[label.first][i];
-          nmin = ( nmin < cnt ) ? nmin : cnt;
-          nmax = ( nmax > cnt ) ? nmax : cnt;
+          nmin = (nmin < cnt) ? nmin : cnt;
+          nmax = (nmax > cnt) ? nmax : cnt;
 
-          outhisto << cnt << "\t" << (cumulate[label.first] += cnt / (double) tot[label.first]) << "\t";
+          outhisto << cnt << "\t" << (cumulate[label.first] += cnt / (double)tot[label.first]) << "\t";
         }
         outhisto << std::endl;
       }
@@ -106,9 +106,10 @@ namespace physycom
     void gnuplot(const std::string &filename) const
     {
       std::string basename = filename.substr(0, filename.find_last_of("."));
+      basename = basename.substr(filename.find_last_of("/\\") + 1);
       std::ofstream outplt(filename);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
-set output ')" << basename << R"(.png'
+set output ')" << basename << R"(.png')" << gnuplot_style << R"(# Grid and Ticks
 # Border xy
 set style line 101 lc rgb '#808080' lt 1 lw 1
 set border 3 front ls 101
@@ -129,7 +130,7 @@ set style line 21 lc rgb '#0072bd' pointtype 7 lw linew ps ptsize # blue
 set style line 22 lc rgb '#d95319' pointtype 7 lw linew ps ptsize # orange
 set style line 23 lc rgb '#edb120' pointtype 7 lw linew ps ptsize # yellow
 # Grid and Ticks
-set ytics 0, )" << int(1.2 * nmax / 5) << ", " << 10 * nmax << R"( nomirror out scale 0.75
+set ytics 0, )" << 1.2 * nmax / 5 << ", " << 10 * nmax << R"( nomirror out scale 0.75
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
 set grid xtics ytics back ls 102
 # More options
@@ -143,12 +144,13 @@ set title ')" << title << R"('
 set xlabel ')" << xlabel << R"('
 set ylabel ')" << ylabel << R"('
 set xtics border in scale 0, 0 nomirror rotate by - 45
+label_undersampling = 2
 plot ')" << basename << R"(.txt')";
 
       int cnt = 0, column = 2, style = 11;
       for (const auto &p : counter)
       {
-        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column << ":xtic(int($0) % 2 == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << style++ << ((cnt != counter.size() - 1) ? " ,\\" : "") << std::endl;
+        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << style++ << ((cnt != counter.size() - 1) ? " ,\\" : "") << std::endl;
         column += 2;
         ++cnt;
       }
@@ -157,10 +159,11 @@ plot ')" << basename << R"(.txt')";
 
     void gnuplot_cdf(const std::string &filename) const
     {
-      std::string basename = filename.substr(0, filename.find_first_of("."));
-      std::ofstream outplt(filename);
+      std::string basename = filename.substr(0, filename.find_last_of("."));
+      std::ofstream outplt(basename + ".cdf.plt");
+      basename = basename.substr(filename.find_last_of("/\\") + 1);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
-set output ')" << basename << R"(.cdf.png'
+set output ')" << basename << R"(.cdf.png')" << gnuplot_style << R"(# Grid and Ticks
 # Border
 set style line 101 lc rgb '#808080' lt 1 lw 1
 set border 11 front ls 101
@@ -182,7 +185,7 @@ set style line 21 lc rgb '#0072bd' pointtype 7 lw linew ps ptsize # blue
 set style line 22 lc rgb '#d95319' pointtype 7 lw linew ps ptsize # orange
 set style line 23 lc rgb '#edb120' pointtype 7 lw linew ps ptsize # yellow
 # Grid and Ticks
-set ytics 0, )" << int(1.2 * nmax/5) << ", " << 10*nmax << R"( nomirror out scale 0.75
+set ytics 0, )" << 1.2 * nmax / 5 << ", " << 10 * nmax << R"( nomirror out scale 0.75
 set y2tics 0, 10, 110 nomirror out scale 0.35
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
 set grid xtics ytics back ls 102
@@ -199,17 +202,43 @@ set xlabel ')" << xlabel << R"('
 set ylabel ')" << ylabel << R"('
 set y2label 'Percentage'
 set xtics border in scale 0, 0 nomirror rotate by - 45
+label_undersampling = 2
 plot ')" << basename << R"(.txt')";
 
       int cnt = 0, column = 2, hstyle = 11, lpstyle = 21;
       for (const auto &p : counter)
       {
-        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column++ << ":xtic(int($0) % 2 == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << hstyle++ << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
+        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column++ << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << hstyle++ << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
         outplt << ((cnt == 0) ? "" : "     ''") << " using (column(0)):($" << column++ << "*100) title '" << p.first << "-cdf' with linespoints ls " << lpstyle++ << " axes x1y2 " << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
       }
       outplt.close();
     }
 
+    std::string gnuplot_style = R"(# Border
+set style line 101 lc rgb '#808080' lt 1 lw 1
+set border 11 front ls 101
+set tics nomirror out scale 0.75
+set format y '%.0s %c'
+set format y2 '%.0s %%'
+set border linewidth 1.5
+# Styles
+linew = 1.2
+ptsize = 1.5
+set style line 11 lc rgb '#0072bd' lt 1 lw linew # blue
+set style line 12 lc rgb '#d95319' lt 1 lw linew # orange
+set style line 13 lc rgb '#edb120' lt 1 lw linew # yellow
+set style line 14 lc rgb '#7e2f8e' lt 1 lw linew # purple
+set style line 15 lc rgb '#77ac30' lt 1 lw linew # green
+set style line 16 lc rgb '#4dbeee' lt 2 lw linew # light - blue
+set style line 17 lc rgb '#a2142f' lt 1 lw linew # red
+set style line 21 lc rgb '#0072bd' pointtype 7 lw linew ps ptsize # blu
+set style line 22 lc rgb '#d95319' pointtype 7 lw linew ps ptsize # orange
+set style line 23 lc rgb '#edb120' pointtype 7 lw linew ps ptsize # yellow
+set style line 24 lc rgb '#7e2f8e' pointtype 7 lw linew ps ptsize # purple
+set style line 25 lc rgb '#77ac30' pointtype 7 lw linew ps ptsize # green
+set style line 26 lc rgb '#4dbeee' pointtype 7 lw linew ps ptsize # light - blue
+set style line 27 lc rgb '#a2142f' pointtype 7 lw linew ps ptsize # red
+)";
   };
 
   template<typename T>
@@ -220,10 +249,10 @@ plot ')" << basename << R"(.txt')";
     void add_histo(std::string name, T min, T max, int nbin, std::string xl = "Xlabel", std::string yl = "Counter", std::string t = "Title") { hs[name] = histo<T>(min, max, nbin, xl, yl, t); }
     void count(std::string name, std::string tag, T t) { hs[name].count(tag, t); }
     void push(std::string name, std::string tag, T t) { hs[name].data[tag].push_back(t); }
-    void populate() { for(auto &h : hs) h.second.populate(); }
-    void dump() { for(auto &h : hs) h.second.dump("histo_" + h.first + ".txt"); }
-    void gnuplot() { for (auto &h : hs) h.second.gnuplot("histo_" + h.first + ".plt"); }
-    void gnuplot_cdf() { for(auto &h : hs) h.second.gnuplot_cdf("histo_" + h.first + ".cdf.plt"); }
+    void populate() { for (auto &h : hs) h.second.populate(); }
+    void dump(std::string path_prefix = "") { for (auto &h : hs) h.second.dump(path_prefix + "histo_" + h.first + ".txt"); }
+    void gnuplot(std::string path_prefix = "") { for (auto &h : hs) h.second.gnuplot(path_prefix + "histo_" + h.first + ".plt"); }
+    void gnuplot_cdf(std::string path_prefix = "") { for (auto &h : hs) h.second.gnuplot_cdf(path_prefix + "histo_" + h.first + ".plt"); }
   };
 
   template<typename T>
@@ -253,15 +282,15 @@ plot ')" << basename << R"(.txt')";
       }
 
       // mean
-      for(auto &x : mh->hs)
-        for(auto &tag : x.second.data)
+      for (auto &x : mh->hs)
+        for (auto &tag : x.second.data)
           for (int i = 0; i < tag.second.size(); ++i)
             mean[tag.first][x.first] += x.second.data[tag.first][i];
 
       // quad mean
-      for(auto &x : mh->hs)
-        for(auto &y : mh->hs)
-          for(auto &tag : x.second.data)
+      for (auto &x : mh->hs)
+        for (auto &y : mh->hs)
+          for (auto &tag : x.second.data)
             for (int i = 0; i < tag.second.size(); ++i)
             {
               quad[tag.first][x.first][y.first] += x.second.data[tag.first][i] * y.second.data[tag.first][i];
@@ -269,9 +298,9 @@ plot ')" << basename << R"(.txt')";
             }
 
       // covariance
-      for(auto tag : quad)
-        for(auto i : tag.second)
-          for(auto j : i.second)
+      for (auto tag : quad)
+        for (auto i : tag.second)
+          for (auto j : i.second)
           {
             std::cout << tag.first << " " << i.first << " " << j.first << std::endl;
             cov[tag.first][i.first][j.first] = quad[tag.first][i.first][j.first] / double(ndata[tag.first]) - mean[tag.first][i.first] * mean[tag.first][j.first] / double(ndata[tag.first] * ndata[tag.first]);
