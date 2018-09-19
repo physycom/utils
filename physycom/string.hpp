@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <cctype>
+#include <algorithm>
 
 namespace physycom{
 
