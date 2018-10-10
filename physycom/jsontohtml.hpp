@@ -237,8 +237,16 @@ std::string json_to_html<json_t>::get_html()
 
       if (verbose)
       {
+        if (trips[i][j].has_member("ID"))
+          tooltip += "<br />ID: " + trips[i][j].at("ID").template as<std::string>();
+        if (trips[i][j].has_member("geohash"))
+          tooltip += "<br />geohash: " + trips[i][j].at("geohash").template as<std::string>();
+        /*
+        if (trips[i][j].has_member("name"))
+          tooltip += "<br />name: " + trips[i][j].at("name").template as<std::string>();
+        */
         if (trips[i][j].has_member("date"))
-          tooltip = "date: " + trips[i][j].at("date").template as<std::string>();
+          tooltip += "<br />date: " + trips[i][j].at("date").template as<std::string>();
         if (trips[i][j].has_member("alt"))
           tooltip += "<br />altitude: " + trips[i][j].at("alt").template as<std::string>();
         if (trips[i][j].has_member("delta_dist"))
