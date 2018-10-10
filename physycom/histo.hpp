@@ -12,6 +12,7 @@
 #include <map>
 #include <fstream>
 #include <numeric>
+#include <algorithm>
 
 namespace physycom
 {
@@ -110,6 +111,26 @@ namespace physycom
       std::ofstream outplt(filename);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
 set output ')" << basename << R"(.png')" << gnuplot_style << R"(# Grid and Ticks
+# Border xy
+set style line 101 lc rgb '#808080' lt 1 lw 1
+set border 3 front ls 101
+set tics nomirror out scale 0.75
+set format '%.0s %c'
+set border linewidth 1.5
+# Styles
+linew = 1.2
+ptsize = 1.5
+set style line 11 lc rgb '#0072bd' linetype 1 linewidth linew # blue
+set style line 12 lc rgb '#d95319' linetype 1 linewidth linew # orange
+set style line 13 lc rgb '#edb120' linetype 1 linewidth linew # yellow
+set style line 14 lc rgb '#7e2f8e' linetype 1 linewidth linew # purple
+set style line 15 lc rgb '#77ac30' linetype 1 linewidth linew # green
+set style line 16 lc rgb '#4dbeee' linetype 2 linewidth linew # light - blue
+set style line 17 lc rgb '#a2142f' linetype 1 linewidth linew # red
+set style line 21 lc rgb '#0072bd' pointtype 7 lw linew ps ptsize # blue
+set style line 22 lc rgb '#d95319' pointtype 7 lw linew ps ptsize # orange
+set style line 23 lc rgb '#edb120' pointtype 7 lw linew ps ptsize # yellow
+# Grid and Ticks
 set ytics 0, )" << 1.2 * nmax / 5 << ", " << 10 * nmax << R"( nomirror out scale 0.75
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
 set grid xtics ytics back ls 102
@@ -144,6 +165,27 @@ plot ')" << basename << R"(.txt')";
       basename = basename.substr(filename.find_last_of("/\\") + 1);
       outplt << R"(set terminal pngcairo  transparent enhanced font "Verdana,20" fontscale 0.8 size 960, 720 background rgb 'white'
 set output ')" << basename << R"(.cdf.png')" << gnuplot_style << R"(# Grid and Ticks
+# Border
+set style line 101 lc rgb '#808080' lt 1 lw 1
+set border 11 front ls 101
+set tics nomirror out scale 0.75
+set format y '%.0s %c'
+set format y2 '%.0s %%'
+set border linewidth 1.5
+# Styles
+linew = 1.2
+ptsize = 1.5
+set style line 11 lc rgb '#0072bd' lt 1 lw linew # blue
+set style line 12 lc rgb '#d95319' lt 1 lw linew # orange
+set style line 13 lc rgb '#edb120' lt 1 lw linew # yellow
+set style line 14 lc rgb '#7e2f8e' lt 1 lw linew # purple
+set style line 15 lc rgb '#77ac30' lt 1 lw linew # green
+set style line 16 lc rgb '#4dbeee' lt 2 lw linew # light - blue
+set style line 17 lc rgb '#a2142f' lt 1 lw linew # red
+set style line 21 lc rgb '#0072bd' pointtype 7 lw linew ps ptsize # blue
+set style line 22 lc rgb '#d95319' pointtype 7 lw linew ps ptsize # orange
+set style line 23 lc rgb '#edb120' pointtype 7 lw linew ps ptsize # yellow
+# Grid and Ticks
 set ytics 0, )" << 1.2 * nmax / 5 << ", " << 10 * nmax << R"( nomirror out scale 0.75
 set y2tics 0, 10, 110 nomirror out scale 0.35
 set style line 102 lc rgb '#d6d7d9' lt 1 lw 1
