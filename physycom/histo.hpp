@@ -7,6 +7,7 @@
 #ifndef PHYSYCOM_UTILS_HISTO_HPP
 #define PHYSYCOM_UTILS_HISTO_HPP
 
+#include <iostream>
 #include <cmath>
 #include <vector>
 #include <map>
