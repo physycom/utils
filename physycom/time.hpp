@@ -20,21 +20,21 @@
 namespace physycom
 {
   // Convert full LOCAL date 'YYYY-MM-DD hh:mm:ss' to unix time (N.B. unix time is DEFINED as GMT)
-  inline size_t date_to_unix(const std::string &date)
+  inline size_t date_to_unix(const std::string &date, const char* format = "%Y-%m-%d %H:%M:%S")
   {
     std::tm t = {};
     t.tm_isdst = -1;              // this enforce the CORRECT recalculation by mktime
     std::stringstream ss(date);
-    ss >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
+    ss >> std::get_time(&t, format);
     return std::mktime(&t);
   }
 
   // Convert unix time to LOCAL date
-  inline std::string unix_to_date(const size_t &t_unix)
+  inline std::string unix_to_date(const size_t &t_unix, const char* format = "%Y-%m-%d %H:%M:%S")
   {
     struct tm * t = std::localtime((time_t *)&t_unix);
     char tcs[100];
-    std::strftime(tcs, sizeof(tcs), "%Y-%m-%d %H:%M:%S", t);
+    std::strftime(tcs, sizeof(tcs), format, t);
     return std::string(tcs);
   }
 
