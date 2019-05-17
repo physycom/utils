@@ -177,7 +177,7 @@ namespace physycom
     return slots;
   }
 
-  std::string get_little_easter(const int &year)
+  inline std::string get_little_easter(const int &year)
   {
     int day,month;
     int a, b, c, d, e, m, n;
@@ -232,7 +232,7 @@ namespace physycom
     return unix_to_date(t, "%d/%m");
   }
 
-  std::map<std::string, std::string> IT_holiday({
+  static std::map<std::string, std::string> IT_holiday({
     { "01/01", "Capodanno"},
     { "06/01", "Epifania"},
     { "25/04", "Liberazione"},
@@ -245,7 +245,7 @@ namespace physycom
     { "26/12", "Santo Stefano"},
   });
 
-  bool is_holiday_IT(const size_t &t_unix)
+  inline bool is_holiday_IT(const size_t &t_unix)
   {
     // sundays
     auto dm = unix_to_date(t_unix, "%w");
