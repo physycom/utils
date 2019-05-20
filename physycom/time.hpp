@@ -14,6 +14,7 @@
 #include <string>
 #include <ctime>
 #include <sstream>
+#include <map>
 
 #include <physycom/string.hpp>
 
@@ -269,4 +270,3 @@ namespace physycom
 } // end namespace physycom
 
 #endif //PHYSYCOM_UTILS_TIME_HPP
-
