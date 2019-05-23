@@ -14,27 +14,28 @@
 #include <string>
 #include <ctime>
 #include <sstream>
+#include <map>
 
 #include <physycom/string.hpp>
 
 namespace physycom
 {
   // Convert full LOCAL date 'YYYY-MM-DD hh:mm:ss' to unix time (N.B. unix time is DEFINED as GMT)
-  inline size_t date_to_unix(const std::string &date)
+  inline size_t date_to_unix(const std::string &date, const char* format = "%Y-%m-%d %H:%M:%S")
   {
     std::tm t = {};
     t.tm_isdst = -1;              // this enforce the CORRECT recalculation by mktime
     std::stringstream ss(date);
-    ss >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
+    ss >> std::get_time(&t, format);
     return std::mktime(&t);
   }
 
   // Convert unix time to LOCAL date
-  inline std::string unix_to_date(const size_t &t_unix)
+  inline std::string unix_to_date(const size_t &t_unix, const char* format = "%Y-%m-%d %H:%M:%S")
   {
     struct tm * t = std::localtime((time_t *)&t_unix);
     char tcs[100];
-    std::strftime(tcs, sizeof(tcs), "%Y-%m-%d %H:%M:%S", t);
+    std::strftime(tcs, sizeof(tcs), format, t);
     return std::string(tcs);
   }
 
@@ -177,7 +178,95 @@ namespace physycom
     return slots;
   }
 
+  inline std::string get_little_easter(const int &year)
+  {
+    int day,month;
+    int a, b, c, d, e, m, n;
+
+    switch(year/100)
+    {
+      case 15:  // 1583 - 1599
+      case 16:  // 1600 - 1699
+        m=22; n=2;  break;
+      case 17:  // 1700 - 1799
+        m=23; n=3; break;
+      case 18:  // 1800 - 1899
+        m=23; n=4; break;
+      case 19:  // 1900 - 1999
+      case 20:  // 2000 - 2099
+        m=24; n=5;break;
+      case 21:  // 2100 - 2199
+        m=24; n=6; break;
+      case 22:  // 2200 - 2299
+        m=25; n=0; break;
+      case 23:  // 2300 - 2399
+        m=26; n=1; break;
+      case 24:  // 2400 - 2499
+        m=25; n=1; break;
+    }
+
+    a=year%19;
+    b=year%4;
+    c=year%7;
+    d=(19*a+m)%30;
+    e=(2*b+4*c+6*d+n)%7;
+    day=d+e;
+
+    if (d+e<10)
+    {
+      day += 22;
+      month = 3;
+    }
+    else
+    {
+      day -= 9;
+      month = 4;
+
+      if ((day==26)||((day==25)&&(d==28)&&(e==6)&&(a>10)))
+      {
+        day -= 7;
+      }
+    }
+
+    auto t = date_to_unix(std::to_string(day) + "/" + std::to_string(month), "%d/%m") + 24*60*60;
+
+    return unix_to_date(t, "%d/%m");
+  }
+
+  static std::map<std::string, std::string> IT_holiday({
+    { "01/01", "Capodanno"},
+    { "06/01", "Epifania"},
+    { "25/04", "Liberazione"},
+    { "01/05", "Festa del Lavoro"},
+    { "02/06", "Festa della Repubblica"},
+    { "15/09", "Ferragosto"},
+    { "01/11", "Ognissanti"},
+    { "08/12", "Immacolata Concezione"},
+    { "25/12", "Natale"},
+    { "26/12", "Santo Stefano"},
+  });
+
+  inline bool is_holiday_IT(const size_t &t_unix)
+  {
+    // sundays
+    auto dm = unix_to_date(t_unix, "%w");
+    if( dm == "0" )
+      return true;
+
+    // holidays
+    dm = unix_to_date(t_unix, "%d/%m");
+    for(const auto &p : physycom::IT_holiday)
+      if(p.first == dm)
+        return true;
+
+    // little-easter
+    auto y = std::stoi(unix_to_date(t_unix, "%Y"));
+    if( dm == get_little_easter(y) )
+      return true;
+
+    return false;
+  }
+
 } // end namespace physycom
 
 #endif //PHYSYCOM_UTILS_TIME_HPP
-

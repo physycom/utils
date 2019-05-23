@@ -7,6 +7,7 @@
 #ifndef PHYSYCOM_UTILS_SPLIT_HPP
 #define PHYSYCOM_UTILS_SPLIT_HPP
 
+#include <string>
 #include <vector>
 #include <cctype>
 #include <algorithm>
