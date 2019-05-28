@@ -10,7 +10,7 @@
 namespace physycom
 {
 
-  int factorial(const int &n)
+  inline int factorial(const int &n)
   {
     if(n<0) throw std::runtime_error("physycom::factorial argument must be non-negative");
     int res = 1;
@@ -18,7 +18,7 @@ namespace physycom
     return res;
   }
 
-  int binom(const int &n, const int &k)
+  inline int binom(const int &n, const int &k)
   {
     if(n<0 && k<0 && n<k) throw std::runtime_error("physycom::binom argument must be non-negative with n >= k");
     int res = 1;
