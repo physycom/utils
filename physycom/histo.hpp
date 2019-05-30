@@ -102,20 +102,21 @@ namespace physycom
         tot[p.first] = std::accumulate(p.second.begin(), p.second.end(), 0);
       });
 
+      char sep = '\t';
       std::ofstream outhisto(filename);
-      outhisto << "  bin  ";
-      for (const auto &label : counter) outhisto << label.first << "-cnt  " << label.first << "-cdf  ";
+      outhisto << "bin";
+      for (const auto &label : counter) outhisto << sep << label.first << "-cnt" << sep << label.first << "-cdf";
       outhisto << std::endl;
       for (int i = 0; i < nbin; ++i)
       {
-        outhisto << min + i * binw << "\t";
+        outhisto << min + i * binw;
         for (const auto &label : counter)
         {
           int cnt = counter[label.first][i];
           nmin = (nmin < cnt) ? nmin : cnt;
           nmax = (nmax > cnt) ? nmax : cnt;
 
-          outhisto << cnt << "\t" << (cumulate[label.first] += cnt / (double)tot[label.first]) << "\t";
+          outhisto << sep << cnt << sep << (cumulate[label.first] += cnt / (double)tot[label.first]);
         }
         outhisto << std::endl;
       }
