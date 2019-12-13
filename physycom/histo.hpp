@@ -58,7 +58,7 @@ namespace physycom
 
     void count(const std::string &tag, const T &t)
     {
-      if (counter[tag].size() != nbin) counter[tag].resize(nbin, 0);
+      if (int(counter[tag].size()) != nbin) counter[tag].resize(nbin, 0);
       int idx = int((t - min) / binw);
       if (idx < 0) return;
       counter[tag][(idx > nbin - 1) ? nbin - 1 : idx]++;
@@ -213,8 +213,8 @@ plot ')" << basename << R"(.txt')";
       int cnt = 0, column = 2, hstyle = 11, lpstyle = 21;
       for (const auto &p : counter)
       {
-        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column++ << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << hstyle++ << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
-        outplt << ((cnt == 0) ? "" : "     ''") << " using (column(0)):($" << column++ << "*100) title '" << p.first << "-cdf' with linespoints ls " << lpstyle++ << " axes x1y2 " << ((cnt != 2 * counter.size() - 1) ? " ,\\" : "") << std::endl; cnt++;
+        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column++ << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << hstyle++ << ((cnt != int(2 * counter.size() - 1)) ? " ,\\" : "") << std::endl; cnt++;
+        outplt << ((cnt == 0) ? "" : "     ''") << " using (column(0)):($" << column++ << "*100) title '" << p.first << "-cdf' with linespoints ls " << lpstyle++ << " axes x1y2 " << ((cnt != int(2 * counter.size() - 1)) ? " ,\\" : "") << std::endl; cnt++;
       }
       outplt.close();
     }
