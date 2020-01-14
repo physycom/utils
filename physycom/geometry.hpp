@@ -47,10 +47,22 @@ namespace physycom
   struct Box
   {
     int xmin, xmax, ymin, ymax;
+    Box() : xmin(0), xmax(0), ymin(0), ymax(0) {}
     Box(const int &xmin, const int &xmax, const int &ymin, const int &ymax) : xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax) {}
     bool contains(const Point &p)
     {
       return p.x > xmin && p.x < xmax && p.y > ymin && p.y < ymax;
+    }
+    void encompass(const Point &p)
+    {
+      if (xmin > p.x)
+        xmin = (p.x > 0) ? 0.9*p.x : 1.1*p.x;
+      if (xmax < p.x)
+        xmax = (p.x > 0) ? 1.1*p.x : 0.9*p.x;
+      if (ymin > p.y)
+        ymin = (p.y > 0) ? 0.9*p.y : 1.1*p.y;
+      if (xmax < p.x)
+        ymax = (p.y > 0) ? 1.1*p.y : 0.9*p.y;
     }
   };
 
@@ -67,6 +79,8 @@ namespace boost
 {
   namespace polygon
   {
+    using namespace physycom;
+
     template <>
     struct geometry_concept<Point>
     {
@@ -108,11 +122,12 @@ namespace physycom
 {
   struct voronoi
   {
-    std::vector<Point> points;
+    std::vector<Point> points, points_voro;
     Box bounds;
     std::vector<Polygon> cells;
     voronoi_diagram<double> vd;
 
+    voronoi() {}
     voronoi(const std::vector<Point> &points, const Box &bounds) : points(points), bounds(bounds)
     {
       construct_voronoi(this->points.begin(), this->points.end(), &(this->vd));
@@ -127,6 +142,7 @@ namespace physycom
             // retrieve point in cell
             std::size_t index = cell->source_index();
             Point p = this->points[index];
+            points_voro.push_back(p);
             std::cout << "cell #" << cell_index << std::endl;
 
             // loop over cell edges
