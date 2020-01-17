@@ -16,18 +16,21 @@ using boost::polygon::y;
 using boost::polygon::low;
 using boost::polygon::high;
 
+
 namespace physycom
 {
+  constexpr double PI = 3.1415926535;
+  inline double atan2_2pi(const double &y, const double &x)
+  {
+    double th = std::atan2(y,x);
+    return (th >= 0) ? th : 2*PI + th;
+  }
+
   struct Point
   {
     int x, y;
     Point() : x(0), y(0) {}
     Point(int x, int y) : x(x), y(y) {}
-    friend std::ostream &operator<<(std::ostream &stream, const Point &p)
-    {
-      stream << "[" << p.x << "," << p.y << "]";
-      return stream;
-    }
     bool operator==(const Point &p)
     {
       return x == p.x && y == p.y;
@@ -35,6 +38,11 @@ namespace physycom
     bool operator!=(const Point &p)
     {
       return ! (*this == p);
+    }
+    friend std::ostream &operator<<(std::ostream &stream, const Point &p)
+    {
+      stream << "[" << p.x << "," << p.y << "]";
+      return stream;
     }
   };
 
@@ -63,6 +71,11 @@ namespace physycom
         ymin = (p.y > 0) ? 0.9*p.y : 1.1*p.y;
       if (xmax < p.x)
         ymax = (p.y > 0) ? 1.1*p.y : 0.9*p.y;
+    }
+    friend std::ostream &operator<<(std::ostream &stream, const Box &b)
+    {
+      stream << "[" << b.xmin << "," << b.xmax << "]x[" << b.ymin << "," << b.ymax << "]";
+      return stream;
     }
   };
 
@@ -162,20 +175,6 @@ namespace physycom
               }
               else if (edge->is_infinite())
               {
-                Point p;
-//                std::cout << "v0 " << (edge->vertex0() == NULL) << std::endl;
-//                std::cout << "v1 " << (edge->vertex1() == NULL) << std::endl;
-                if (edge->vertex0() != NULL)
-                {
-                  p = Point(edge->vertex0()->x(), edge->vertex0()->y());
-                }
-                else if (edge->vertex1() != NULL)
-                {
-                  p = Point(edge->vertex1()->x(), edge->vertex1()->y());
-                }
-
-                std::cout << "INFINITE " << p << " " << std::endl;
-
                 auto cell1 = edge->cell();
                 auto cell2 = edge->twin()->cell();
                 Point origin, direction;
@@ -189,40 +188,53 @@ namespace physycom
                   direction.x = p1.y - p2.y;
                   direction.y = p2.x - p1.x;
                 }
-                int side = bounds.xmax - bounds.xmin;
-                int koef = side / (std::max)(fabs(direction.x), fabs(direction.y));
+
+                double theta1 = physycom::atan2_2pi(bounds.ymax - origin.y, bounds.xmax - origin.x);
+                double theta2 = physycom::atan2_2pi(bounds.ymax - origin.y, bounds.xmin - origin.x);
+                double theta3 = physycom::atan2_2pi(bounds.ymin - origin.y, bounds.xmin - origin.x);
+                double theta4 = physycom::atan2_2pi(bounds.ymin - origin.y, bounds.xmax - origin.x);
+
+/*
+                std::cout << "t1 " << theta1 * 180 / PI << " " << bounds.ymax - origin.y << " " << bounds.xmax - origin.x << std::endl
+                          << "t2 " << theta2 * 180 / PI << " " << bounds.ymax - origin.y << " " << bounds.xmin - origin.x << std::endl
+                          << "t3 " << theta3 * 180 / PI << " " << bounds.ymin - origin.y << " " << bounds.xmin - origin.x << std::endl
+                          << "t4 " << theta4 * 180 / PI << " " << bounds.ymin - origin.y << " " << bounds.xmax - origin.x << std::endl;
+*/
+
                 if (edge->vertex0() == NULL)
                 {
-                  clipped_edge.push_back(Point(origin.x - direction.x * koef,origin.y - direction.y * koef));
+                  direction.x *= -1;
+                  direction.y *= -1;
                 }
-                else
-                {
-                  clipped_edge.push_back(Point(edge->vertex0()->x(), edge->vertex0()->y()));
-                }
-                if (edge->vertex1() == NULL)
-                {
-                  clipped_edge.push_back(Point(origin.x + direction.x * koef, origin.y + direction.y * koef));
-                }
-                else
-                {
-                  clipped_edge.push_back(Point(edge->vertex1()->x(), edge->vertex1()->y()));
-                }
-                for (auto pt : clipped_edge)
+                double thetad = physycom::atan2_2pi(direction.y, direction.x);
+
+                Point clipped;
+                if ( thetad <= theta1 || thetad > theta4 )
+                  clipped = Point(bounds.xmax, origin.y + ( direction.y * ( bounds.xmax - origin.x) ) / direction.x );
+                else if ( thetad <= theta2 )
+                  clipped = Point(origin.x + ( direction.x * ( bounds.ymax - origin.y) ) / direction.y, bounds.ymax );
+                else if ( thetad <= theta3 )
+                  clipped = Point(bounds.xmin, origin.y - ( direction.y * ( bounds.xmin - origin.x) ) / direction.x );
+                else if ( thetad <= theta4 )
+                  clipped = Point(origin.x - ( direction.x * ( bounds.ymin - origin.y) ) / direction.y, bounds.ymin );
+                std::cout << "clip " << origin << " " << direction << " " << clipped << std::endl;
+                std::cout << "INFINITE " << origin << " " << clipped <<  std::endl;
+
+                if (edge->vertex0() != NULL)
                 {
                   if (pg.points.size() == 0)
-                    pg.points.push_back(pt);
-                  if (pg.points.back() != pt)
-                    pg.points.push_back(pt);
+                    pg.points.push_back(origin);
+                  if (pg.points.back() != origin)
+                    pg.points.push_back(origin);
+                  pg.points.push_back(clipped);
                 }
+                else
+                {
+                  pg.points.push_back(clipped);
+                  pg.points.push_back(origin);
+                }
+
               }
-/*
-              if (edge->is_primary())
-              {
-                Point p0 = edge->vertex0() ? Point(edge->vertex0()->x(), edge->vertex0()->y()) : Point(-1, -1);
-                Point p1 = edge->vertex1() ? Point(edge->vertex1()->x(), edge->vertex1()->y()) : Point(-1, -1);
-                std::cout << "* edge #" << edge_cnt << " " << p0 << " " << p1 << std::endl;
-              }
-*/
               edge_cnt++;
             } while (edge != cell->incident_edge());
           }
