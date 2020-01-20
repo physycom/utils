@@ -176,7 +176,7 @@ plot ')" << basename << R"(.txt')";
       int cnt = 0, column = 2, style = 11;
       for (const auto &p : counter)
       {
-        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << style++ << ((cnt != counter.size() - 1) ? " ,\\" : "") << std::endl;
+        outplt << ((cnt == 0) ? "" : "     ''") << " using " << column << ":xtic(int($0) % label_undersampling == 0 ? stringcolumn(1) : '') title '" << p.first << "' ls " << style++ << ((cnt != int(counter.size() - 1)) ? " ,\\" : "") << std::endl;
         column += 2;
         ++cnt;
       }
