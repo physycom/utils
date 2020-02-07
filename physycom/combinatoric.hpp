@@ -26,7 +26,7 @@ namespace physycom
     return res/factorial(k);
   }
 
-  struct
+  static struct
   {
     template<typename T>
     std::vector<T> operator()(T elem)
@@ -43,7 +43,7 @@ namespace physycom
 
   } permutations;
 
-  struct
+  static struct
   {
     std::vector<unsigned long> pos;
 
