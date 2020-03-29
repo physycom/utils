@@ -2,6 +2,7 @@
 #define PHYSYCOM_UTILS_GEOMETRY_HPP
 
 #include <type_traits>
+#include <tuple>
 
 namespace physycom
 {
