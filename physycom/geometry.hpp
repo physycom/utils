@@ -2,6 +2,7 @@
 #define PHYSYCOM_UTILS_GEOMETRY_HPP
 
 #include <type_traits>
+#include <tuple>
 
 namespace physycom
 {
@@ -70,6 +71,34 @@ namespace physycom
     return wn != 0; // wn=0 <=> p is outside
   }
 
+  template <typename point_t>
+  bool intersection(point_t a0, point_t &a1, point_t &b0, point_t &b1)
+  {
+    auto ta0 = to_coords_tuple(a0);
+    auto ta1 = to_coords_tuple(a1);
+    auto tb0 = to_coords_tuple(b0);
+    auto tb1 = to_coords_tuple(b1);
+    auto a0x = *std::get<X>(ta0);
+    auto a1x = *std::get<X>(ta1);
+    auto b0x = *std::get<X>(tb0);
+    auto b1x = *std::get<X>(tb1);
+    auto a0y = *std::get<Y>(ta0);
+    auto a1y = *std::get<Y>(ta1);
+    auto b0y = *std::get<Y>(tb0);
+    auto b1y = *std::get<Y>(tb1);
+
+    auto cross = (b1x - b0x) * (a1y - a0y) - (a1x - a0x) * (b1y - b0y);
+    if (!int(cross)) return false;
+
+    float inv_cross = 1.f / float(cross);
+    float sa = ( (a1x - b0x) * (a1y - a0y) - (a1x - a0x) * (a1y - b0y) ) * inv_cross;
+    float sb = ( (a1x - b0x) * (b1y - b0y) - (b1x - b0x) * (a1y - b0y) ) * inv_cross;
+
+    if (sa > 0 && sa < 1 && sb > 0 && sb < 1)  // segment-segment crossing
+      return true;
+
+    return false;
+  }
 }
 
 #endif // PHYSYCOM_UTILS_GEOMETRY_HPP
