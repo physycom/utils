@@ -23,15 +23,18 @@ namespace physycom
   {
     point_t c;
     auto tc = to_coords_tuple(c);
+    double x = 0.;
+    double y = 0.;
     for (auto &p : points)
     {
       auto tp = to_coords_tuple(p);
-      *std::get<X>(tc) += *std::get<X>(tp);
-      *std::get<Y>(tc) += *std::get<Y>(tp);
+      x += double(*std::get<X>(tp));
+      y += double(*std::get<Y>(tp));
+      //std::cout << "x " << *std::get<X>(tc) << std::endl;
     }
     using vtype = typename std::remove_reference<decltype(*std::get<X>(tc))>::type;
-    *std::get<X>(tc) /= vtype(points.size());
-    *std::get<Y>(tc) /= vtype(points.size());
+    *std::get<X>(tc) = vtype( x / double(points.size()));
+    *std::get<Y>(tc) = vtype( y / double(points.size()));
     return c;
   }
 
