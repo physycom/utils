@@ -6,6 +6,7 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include <string>
 
 #include <physycom/histo.hpp>
 
@@ -90,4 +91,3 @@ int main()
 
 	return 0;
 }
-

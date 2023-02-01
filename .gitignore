@@ -1,39 +1,32 @@
-# Compiled Object files
-*.slo
-*.lo
+# Copyright 2019, Stefano Sinigardi
+
 *.o
-*.obj
-*.suo
-*.u2d
-*.sdf
-*.user
+*.a
+*.dSYM
+*.so
+*.exe
+*.dll
+*.lib
+data/
+build*/
+vcpkg_installed/
+vcpkg/
+build.log
+
+# OS Generated #
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
 *.swp
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-.DS_Store
-
-[Bb]uild*/
-[Bb]in/
+# IDE generated #
 .vs/
 .vscode/
+
+# Build artifacts
+bin/
+include/
+share/
+lib/
+doc/

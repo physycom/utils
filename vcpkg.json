@@ -1,0 +1,11 @@
+{
+  "name": "physycom-utils",
+  "version": "1.0.0",
+  "homepage": "https://github.com/physycom/utils",
+  "description": "A collection of ready to use, very fast and easy to learn template libraries",
+  "dependencies":
+  [
+    "boost-algorithm",
+    "boost-polygon"
+  ]
+}
