@@ -35,6 +35,7 @@ set(INSTALL_INCLUDE_DIR  "include"               CACHE PATH "Path where headers 
 set(INSTALL_CMAKE_DIR    "share/${PROJECT_NAME}" CACHE PATH "Path where cmake configs will be installed")
 
 find_package(Boost REQUIRED)
+find_package(Catch2 REQUIRED)
 
 add_executable(test_gnssconv     ${CMAKE_SOURCE_DIR}/test/test_gnssconv.cpp)
 add_executable(test_split        ${CMAKE_SOURCE_DIR}/test/test_split.cpp)
@@ -47,7 +48,7 @@ target_include_directories(test_combinatoric PRIVATE ${CMAKE_SOURCE_DIR})
 target_include_directories(test_histo        PRIVATE ${CMAKE_SOURCE_DIR})
 
 target_link_libraries(test_gnssconv     PRIVATE Boost::boost)
-target_link_libraries(test_split        PRIVATE Boost::boost)
+target_link_libraries(test_split        PRIVATE Boost::boost Catch2::Catch2WithMain)
 target_link_libraries(test_combinatoric PRIVATE Boost::boost)
 target_link_libraries(test_histo        PRIVATE Boost::boost)
 

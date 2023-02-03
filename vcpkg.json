@@ -6,6 +6,7 @@
   "dependencies":
   [
     "boost-algorithm",
-    "boost-polygon"
+    "boost-polygon",
+    "catch"
   ]
 }
