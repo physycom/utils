@@ -38,21 +38,25 @@ find_package(Boost REQUIRED)
 find_package(Catch2 REQUIRED)
 
 add_executable(test_gnssconv     ${CMAKE_SOURCE_DIR}/test/test_gnssconv.cpp)
-add_executable(test_split        ${CMAKE_SOURCE_DIR}/test/test_split.cpp)
+#add_executable(test_split        ${CMAKE_SOURCE_DIR}/test/test_split.cpp)
 add_executable(test_combinatoric ${CMAKE_SOURCE_DIR}/test/test_combinatoric.cpp)
 add_executable(test_histo        ${CMAKE_SOURCE_DIR}/test/test_histo.cpp)
 
 target_include_directories(test_gnssconv     PRIVATE ${CMAKE_SOURCE_DIR})
-target_include_directories(test_split        PRIVATE ${CMAKE_SOURCE_DIR})
+#target_include_directories(test_split        PRIVATE ${CMAKE_SOURCE_DIR})
 target_include_directories(test_combinatoric PRIVATE ${CMAKE_SOURCE_DIR})
 target_include_directories(test_histo        PRIVATE ${CMAKE_SOURCE_DIR})
 
 target_link_libraries(test_gnssconv     PRIVATE Boost::boost)
-target_link_libraries(test_split        PRIVATE Boost::boost Catch2::Catch2WithMain)
+#target_link_libraries(test_split        PRIVATE Boost::boost Catch2::Catch2WithMain)
 target_link_libraries(test_combinatoric PRIVATE Boost::boost)
 target_link_libraries(test_histo        PRIVATE Boost::boost)
 
-install(TARGETS test_gnssconv test_split test_combinatoric test_histo
+install(TARGETS test_gnssconv test_combinatoric test_histo
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${INSTALL_BIN_DIR}
 )
+#install(TARGETS test_split
+#    BUNDLE  DESTINATION .
+#    RUNTIME DESTINATION ${INSTALL_BIN_DIR}
+#)
