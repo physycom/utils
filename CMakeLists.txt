@@ -45,7 +45,7 @@ endif()
 
 set(INSTALL_BIN_DIR      "bin"                     CACHE PATH "Path where exe and dll will be installed")
 set(INSTALL_LIB_DIR      "lib"                     CACHE PATH "Path where lib will be installed")
-set(INSTALL_INCLUDE_DIR  "include/${PROJECT_NAME}" CACHE PATH "Path where headers will be installed ")
+set(INSTALL_INCLUDE_DIR  "include/physycom"        CACHE PATH "Path where headers will be installed ")
 set(INSTALL_CMAKE_DIR    "share/${PROJECT_NAME}"   CACHE PATH "Path where cmake configs will be installed")
 
 find_package(Boost REQUIRED)
