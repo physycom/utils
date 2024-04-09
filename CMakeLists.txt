@@ -56,6 +56,7 @@ file(GLOB interfaceSRC
 )
 add_library(utils INTERFACE ${interfaceSRC})
 target_include_directories(utils INTERFACE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}> $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>)
+set_target_properties(utils PROPERTIES PUBLIC_HEADER "${interfaceSRC}")
 
 add_executable(test_gnssconv     ${CMAKE_SOURCE_DIR}/test/test_gnssconv.cpp)
 #add_executable(test_split        ${CMAKE_SOURCE_DIR}/test/test_split.cpp)
